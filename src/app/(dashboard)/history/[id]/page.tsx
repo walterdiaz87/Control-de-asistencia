@@ -35,34 +35,44 @@ interface Session {
 }
 
 export default function HistoryPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = use(params);
+    const resolvedParams = use(params);
+    const [currentId, setCurrentId] = useState(resolvedParams.id);
     const [sessions, setSessions] = useState<Session[]>([]);
     const [students, setStudents] = useState<Student[]>([]);
     const [group, setGroup] = useState<any>(null);
+    const [allGroups, setAllGroups] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'dashboard' | 'reports'>('dashboard');
 
     // Reports State
     const [selectedDateStr, setSelectedDateStr] = useState(new Date().toISOString().split('T')[0]);
-    const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'present' | 'absent' | 'justified' | 'unjustified'>('all');
 
     const supabase = createClient();
     const router = useRouter();
+
+    // Fetch all groups for the dropdown once
+    useEffect(() => {
+        async function fetchAllGroups() {
+            const { data } = await supabase.from('groups').select('*').order('name');
+            if (data) setAllGroups(data);
+        }
+        fetchAllGroups();
+    }, []);
 
     useEffect(() => {
         async function fetchData() {
             setLoading(true);
             try {
                 // 1. Get Group
-                const { data: groupData } = await supabase.from('groups').select('*').eq('id', id).single();
+                const { data: groupData } = await supabase.from('groups').select('*').eq('id', currentId).single();
                 if (groupData) setGroup(groupData);
 
                 // 2. Get Students for the group
                 const { data: studentData } = await supabase
                     .from('group_students')
                     .select('students(id, first_name, last_name, doc_id)')
-                    .eq('group_id', id);
+                    .eq('group_id', currentId);
 
                 if (studentData) {
                     const list = studentData.map((s: any) => s.students)
@@ -75,14 +85,22 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                 const { data: sessionData } = await supabase
                     .from('sessions')
                     .select(`*, attendance_records(*)`)
-                    .eq('group_id', id)
+                    .eq('group_id', currentId)
                     .order('date', { ascending: false });
 
                 if (sessionData) {
                     setSessions(sessionData);
-                    // Set default selected date to latest session if exists
+                    // Update URL if user switched course via dropdown
+                    if (currentId !== resolvedParams.id) {
+                        router.push(`/history/${currentId}`, { scroll: false });
+                    }
+
+                    // Set default selected date if not already set or manually changed
                     if (sessionData.length > 0) {
-                        setSelectedDateStr(sessionData[0].date);
+                        // We check if the current selectedDateStr has a session, if not we pick the latest
+                        if (!sessionData.some(s => s.date === selectedDateStr)) {
+                            setSelectedDateStr(sessionData[0].date);
+                        }
                     }
                 }
             } catch (err) {
@@ -92,7 +110,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
             }
         }
         fetchData();
-    }, [id]);
+    }, [currentId]);
 
     // --- Analytics Logic ---
     const stats = useMemo(() => {
@@ -125,17 +143,10 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
 
     const filteredStudents = useMemo(() => {
         return students.filter(student => {
-            const matchesSearch =
-                student.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                student.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (student.doc_id && student.doc_id.includes(searchQuery));
-
-            if (!matchesSearch) return false;
-
             if (statusFilter === 'all') return true;
 
             const record = activeSession?.attendance_records.find(r => r.student_id === student.id);
-            if (!record) return false; // Or handle "no data" case
+            if (!record) return false;
 
             if (statusFilter === 'present') return record.status === 'present';
             if (statusFilter === 'absent') return record.status === 'absent';
@@ -144,7 +155,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
 
             return true;
         });
-    }, [students, activeSession, searchQuery, statusFilter]);
+    }, [students, activeSession, statusFilter]);
 
     const activeStats = useMemo(() => {
         if (!activeSession) return null;
@@ -321,7 +332,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                                 <button
                                                     onClick={() => {
                                                         const today = new Date().toISOString().split('T')[0];
-                                                        if (sessions.some(s => s.date === today)) setSelectedDateStr(today);
+                                                        setSelectedDateStr(today);
                                                     }}
                                                     className="text-[9px] font-black text-indigo-500 hover:text-indigo-700 uppercase"
                                                 >
@@ -335,41 +346,43 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className="relative group">
-                                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors" />
-                                            <select
+                                        <div className="relative group cursor-pointer">
+                                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors pointer-events-none" />
+                                            <div className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl flex items-center">
+                                                <span className="text-sm font-black text-slate-900 truncate">
+                                                    {format(parseISO(selectedDateStr), "EEEE d 'de' MMMM", { locale: es })}
+                                                </span>
+                                            </div>
+                                            <input
+                                                type="date"
                                                 value={selectedDateStr}
                                                 onChange={(e) => setSelectedDateStr(e.target.value)}
+                                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Seleccionar Curso</label>
+                                        <div className="relative group">
+                                            <LayoutGrid className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors pointer-events-none" />
+                                            <select
+                                                value={currentId}
+                                                onChange={(e) => setCurrentId(e.target.value)}
                                                 className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl text-sm font-black text-slate-900 outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none"
                                             >
-                                                {sessions.length === 0 && <option value={selectedDateStr}>Sin sesiones registradas</option>}
-                                                {sessions.map(s => (
-                                                    <option key={s.id} value={s.date}>
-                                                        {format(parseISO(s.date), "EEEE d 'de' MMMM", { locale: es })}
-                                                    </option>
+                                                {allGroups.length === 0 && <option value="">No hay cursos creados</option>}
+                                                {allGroups.map(g => (
+                                                    <option key={g.id} value={g.id}>{g.name}</option>
                                                 ))}
                                             </select>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Buscar Alumno</label>
-                                        <div className="relative group">
-                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors" />
-                                            <input
-                                                type="text"
-                                                placeholder="Nombre, Apellido o DNI..."
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl text-sm font-black text-slate-900 placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Filtrar por Estado</label>
                                         <div className="relative group">
-                                            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors" />
+                                            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors pointer-events-none" />
                                             <select
                                                 value={statusFilter}
                                                 onChange={(e) => setStatusFilter(e.target.value as any)}
@@ -418,7 +431,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                             </div>
                                         </div>
                                         <button
-                                            onClick={() => router.push(`/attendance/${id}`)}
+                                            onClick={() => router.push(`/attendance/${currentId}`)}
                                             className="w-full h-12 flex items-center justify-center gap-2 text-indigo-600 font-black text-xs hover:bg-indigo-50 rounded-xl transition-all border-2 border-indigo-100"
                                         >
                                             <Edit3 className="w-4 h-4" />
@@ -441,7 +454,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                         <p className="text-sm text-slate-400">No se ha tomado asistencia para este día.</p>
                                     </div>
                                     <button
-                                        onClick={() => router.push(`/attendance/${id}`)}
+                                        onClick={() => router.push(`/attendance/${currentId}`)}
                                         className="brand-button-primary px-8 h-12 text-sm mt-4"
                                     >
                                         Tomar Asistencia Hoy
