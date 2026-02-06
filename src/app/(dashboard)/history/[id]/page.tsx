@@ -42,7 +42,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
     const [group, setGroup] = useState<any>(null);
     const [allGroups, setAllGroups] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'reports'>('dashboard');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'reports'>('reports');
 
     // Reports State
     const [selectedDateStr, setSelectedDateStr] = useState(new Date().toISOString().split('T')[0]);
