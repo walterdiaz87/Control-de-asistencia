@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, use, useMemo } from 'react';
+import { useState, useEffect, use, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import {
@@ -47,6 +47,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
     // Reports State
     const [selectedDateStr, setSelectedDateStr] = useState(new Date().toISOString().split('T')[0]);
     const [statusFilter, setStatusFilter] = useState<'all' | 'present' | 'absent' | 'justified' | 'unjustified'>('all');
+    const dateInputRef = useRef<HTMLInputElement>(null);
 
     const supabase = createClient();
     const router = useRouter();
@@ -324,16 +325,13 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                     </button>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full">
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between items-center ml-1">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full items-end">
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center h-5 ml-1">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fecha del Informe</label>
                                             <div className="flex gap-2">
                                                 <button
-                                                    onClick={() => {
-                                                        const today = new Date().toISOString().split('T')[0];
-                                                        setSelectedDateStr(today);
-                                                    }}
+                                                    onClick={() => setSelectedDateStr(new Date().toISOString().split('T')[0])}
                                                     className="text-[9px] font-black text-indigo-500 hover:text-indigo-700 uppercase"
                                                 >
                                                     Hoy
@@ -346,7 +344,10 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className="relative group cursor-pointer">
+                                        <div
+                                            className="relative group cursor-pointer"
+                                            onClick={() => dateInputRef.current?.showPicker()}
+                                        >
                                             <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors pointer-events-none" />
                                             <div className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl flex items-center">
                                                 <span className="text-sm font-black text-slate-900 truncate">
@@ -354,22 +355,25 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                                 </span>
                                             </div>
                                             <input
+                                                ref={dateInputRef}
                                                 type="date"
                                                 value={selectedDateStr}
                                                 onChange={(e) => setSelectedDateStr(e.target.value)}
-                                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                                className="absolute inset-0 opacity-0 pointer-events-none w-0 h-0"
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Seleccionar Curso</label>
+                                    <div className="space-y-3">
+                                        <div className="h-5 flex items-center ml-1">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seleccionar Curso</label>
+                                        </div>
                                         <div className="relative group">
                                             <LayoutGrid className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors pointer-events-none" />
                                             <select
                                                 value={currentId}
                                                 onChange={(e) => setCurrentId(e.target.value)}
-                                                className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl text-sm font-black text-slate-900 outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none"
+                                                className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl text-sm font-black text-slate-900 outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none cursor-pointer"
                                             >
                                                 {allGroups.length === 0 && <option value="">No hay cursos creados</option>}
                                                 {allGroups.map(g => (
@@ -379,14 +383,16 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Filtrar por Estado</label>
+                                    <div className="space-y-3">
+                                        <div className="h-5 flex items-center ml-1">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filtrar por Estado</label>
+                                        </div>
                                         <div className="relative group">
                                             <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors pointer-events-none" />
                                             <select
                                                 value={statusFilter}
                                                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                                                className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl text-sm font-black text-slate-900 outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none"
+                                                className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl text-sm font-black text-slate-900 outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none cursor-pointer"
                                             >
                                                 <option value="all">Ver Todos</option>
                                                 <option value="present">Solo Presentes</option>
