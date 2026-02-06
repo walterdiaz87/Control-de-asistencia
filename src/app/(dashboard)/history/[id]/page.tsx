@@ -45,9 +45,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
     const [activeTab, setActiveTab] = useState<'dashboard' | 'reports'>('dashboard');
 
     // Reports State
-    const [selectedDateStr, setSelectedDateStr] = useState(new Date().toISOString().split('T')[0]);
     const [statusFilter, setStatusFilter] = useState<'all' | 'present' | 'absent' | 'justified' | 'unjustified'>('all');
-    const dateInputRef = useRef<HTMLInputElement>(null);
 
     const supabase = createClient();
     const router = useRouter();
@@ -325,81 +323,96 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                     </button>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full items-end">
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between items-center h-5 ml-1">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+                                    {/* Fecha del Informe */}
+                                    <div className="flex flex-col gap-2.5">
+                                        <div className="flex justify-between items-center h-4 ml-1">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fecha del Informe</label>
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-3">
                                                 <button
-                                                    onClick={() => setSelectedDateStr(new Date().toISOString().split('T')[0])}
-                                                    className="text-[9px] font-black text-indigo-500 hover:text-indigo-700 uppercase"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setSelectedDateStr(new Date().toISOString().split('T')[0]);
+                                                    }}
+                                                    className="text-[9px] font-black text-indigo-500 hover:text-indigo-700 uppercase tracking-tighter"
                                                 >
                                                     Hoy
                                                 </button>
                                                 <button
-                                                    onClick={() => sessions.length > 0 && setSelectedDateStr(sessions[0].date)}
-                                                    className="text-[9px] font-black text-slate-400 hover:text-slate-600 uppercase"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        if (sessions.length > 0) setSelectedDateStr(sessions[0].date);
+                                                    }}
+                                                    className="text-[9px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-tighter"
                                                 >
                                                     Último
                                                 </button>
                                             </div>
                                         </div>
-                                        <div
-                                            className="relative group cursor-pointer"
-                                            onClick={() => dateInputRef.current?.showPicker()}
-                                        >
-                                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors pointer-events-none" />
-                                            <div className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl flex items-center">
-                                                <span className="text-sm font-black text-slate-900 truncate">
+                                        <div className="relative group overflow-hidden rounded-2xl">
+                                            <div className="w-full bg-slate-50 h-14 pl-12 pr-4 flex items-center transition-all group-hover:bg-slate-100 ring-1 ring-transparent group-hover:ring-indigo-50">
+                                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+                                                <span className="text-sm font-black text-slate-900 truncate uppercase">
                                                     {format(parseISO(selectedDateStr), "EEEE d 'de' MMMM", { locale: es })}
                                                 </span>
                                             </div>
                                             <input
-                                                ref={dateInputRef}
                                                 type="date"
                                                 value={selectedDateStr}
                                                 onChange={(e) => setSelectedDateStr(e.target.value)}
-                                                className="absolute inset-0 opacity-0 pointer-events-none w-0 h-0"
+                                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full appearance-none"
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <div className="h-5 flex items-center ml-1">
+                                    {/* Seleccionar Curso */}
+                                    <div className="flex flex-col gap-2.5">
+                                        <div className="h-4 flex items-center ml-1">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seleccionar Curso</label>
                                         </div>
                                         <div className="relative group">
-                                            <LayoutGrid className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors pointer-events-none" />
-                                            <select
-                                                value={currentId}
-                                                onChange={(e) => setCurrentId(e.target.value)}
-                                                className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl text-sm font-black text-slate-900 outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none cursor-pointer"
-                                            >
-                                                {allGroups.length === 0 && <option value="">No hay cursos creados</option>}
-                                                {allGroups.map(g => (
-                                                    <option key={g.id} value={g.id}>{g.name}</option>
-                                                ))}
-                                            </select>
+                                            <div className="w-full bg-slate-50 h-14 pl-12 pr-4 flex items-center rounded-2xl transition-all group-hover:bg-slate-100 ring-1 ring-transparent group-hover:ring-indigo-50">
+                                                <LayoutGrid className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors pointer-events-none" />
+                                                <select
+                                                    value={currentId}
+                                                    onChange={(e) => setCurrentId(e.target.value)}
+                                                    className="w-full bg-transparent border-none text-sm font-black text-slate-900 outline-none h-full cursor-pointer appearance-none"
+                                                >
+                                                    {allGroups.length === 0 && <option value="">No hay cursos creados</option>}
+                                                    {allGroups.map(g => (
+                                                        <option key={g.id} value={g.id}>{g.name}</option>
+                                                    ))}
+                                                </select>
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                                                    <ChevronLeft className="w-4 h-4 rotate-[-90deg]" />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <div className="h-5 flex items-center ml-1">
+                                    {/* Filtrar por Estado */}
+                                    <div className="flex flex-col gap-2.5">
+                                        <div className="h-4 flex items-center ml-1">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filtrar por Estado</label>
                                         </div>
                                         <div className="relative group">
-                                            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors pointer-events-none" />
-                                            <select
-                                                value={statusFilter}
-                                                onChange={(e) => setStatusFilter(e.target.value as any)}
-                                                className="w-full bg-slate-50 border-none h-14 pl-12 pr-4 rounded-2xl text-sm font-black text-slate-900 outline-none focus:ring-2 focus:ring-indigo-100 transition-all appearance-none cursor-pointer"
-                                            >
-                                                <option value="all">Ver Todos</option>
-                                                <option value="present">Solo Presentes</option>
-                                                <option value="absent">Solo Ausentes</option>
-                                                <option value="justified">Solo Justificados</option>
-                                                <option value="unjustified">Solo No Justificados</option>
-                                            </select>
+                                            <div className="w-full bg-slate-50 h-14 pl-12 pr-4 flex items-center rounded-2xl transition-all group-hover:bg-slate-100 ring-1 ring-transparent group-hover:ring-indigo-50">
+                                                <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors pointer-events-none" />
+                                                <select
+                                                    value={statusFilter}
+                                                    onChange={(e) => setStatusFilter(e.target.value as any)}
+                                                    className="w-full bg-transparent border-none text-sm font-black text-slate-900 outline-none h-full cursor-pointer appearance-none"
+                                                >
+                                                    <option value="all">Ver Todos</option>
+                                                    <option value="present">Solo Presentes</option>
+                                                    <option value="absent">Solo Ausentes</option>
+                                                    <option value="justified">Solo Justificados</option>
+                                                    <option value="unjustified">Solo No Justificados</option>
+                                                </select>
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                                                    <ChevronLeft className="w-4 h-4 rotate-[-90deg]" />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
