@@ -45,6 +45,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
     const [activeTab, setActiveTab] = useState<'dashboard' | 'reports'>('dashboard');
 
     // Reports State
+    const [selectedDateStr, setSelectedDateStr] = useState(new Date().toISOString().split('T')[0]);
     const [statusFilter, setStatusFilter] = useState<'all' | 'present' | 'absent' | 'justified' | 'unjustified'>('all');
 
     const supabase = createClient();
@@ -325,8 +326,8 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                                     {/* Fecha del Informe */}
-                                    <div className="flex flex-col gap-2.5">
-                                        <div className="flex justify-between items-center h-4 ml-1">
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex justify-between items-center h-6 ml-1">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fecha del Informe</label>
                                             <div className="flex gap-3">
                                                 <button
@@ -334,7 +335,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                                         e.preventDefault();
                                                         setSelectedDateStr(new Date().toISOString().split('T')[0]);
                                                     }}
-                                                    className="text-[9px] font-black text-indigo-500 hover:text-indigo-700 uppercase tracking-tighter"
+                                                    className="text-[9px] font-black text-indigo-500 hover:text-indigo-700 uppercase tracking-tighter transition-colors"
                                                 >
                                                     Hoy
                                                 </button>
@@ -343,14 +344,14 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                                         e.preventDefault();
                                                         if (sessions.length > 0) setSelectedDateStr(sessions[0].date);
                                                     }}
-                                                    className="text-[9px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-tighter"
+                                                    className="text-[9px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-tighter transition-colors"
                                                 >
                                                     Último
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className="relative group overflow-hidden rounded-2xl">
-                                            <div className="w-full bg-slate-50 h-14 pl-12 pr-4 flex items-center transition-all group-hover:bg-slate-100 ring-1 ring-transparent group-hover:ring-indigo-50">
+                                        <div className="relative group overflow-hidden rounded-2xl h-14">
+                                            <div className="w-full bg-slate-50 h-full pl-12 pr-4 flex items-center transition-all group-hover:bg-slate-100 ring-1 ring-transparent group-hover:ring-indigo-100/50">
                                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
                                                 <span className="text-sm font-black text-slate-900 truncate uppercase">
                                                     {format(parseISO(selectedDateStr), "EEEE d 'de' MMMM", { locale: es })}
@@ -360,18 +361,18 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                                 type="date"
                                                 value={selectedDateStr}
                                                 onChange={(e) => setSelectedDateStr(e.target.value)}
-                                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full appearance-none"
+                                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
                                             />
                                         </div>
                                     </div>
 
                                     {/* Seleccionar Curso */}
-                                    <div className="flex flex-col gap-2.5">
-                                        <div className="h-4 flex items-center ml-1">
+                                    <div className="flex flex-col gap-2">
+                                        <div className="h-6 flex items-center ml-1">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seleccionar Curso</label>
                                         </div>
                                         <div className="relative group">
-                                            <div className="w-full bg-slate-50 h-14 pl-12 pr-4 flex items-center rounded-2xl transition-all group-hover:bg-slate-100 ring-1 ring-transparent group-hover:ring-indigo-50">
+                                            <div className="w-full bg-slate-50 h-14 pl-12 pr-4 flex items-center rounded-2xl transition-all group-hover:bg-slate-100 ring-1 ring-transparent group-hover:ring-indigo-100/50">
                                                 <LayoutGrid className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors pointer-events-none" />
                                                 <select
                                                     value={currentId}
@@ -391,12 +392,12 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                     </div>
 
                                     {/* Filtrar por Estado */}
-                                    <div className="flex flex-col gap-2.5">
-                                        <div className="h-4 flex items-center ml-1">
+                                    <div className="flex flex-col gap-2">
+                                        <div className="h-6 flex items-center ml-1">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filtrar por Estado</label>
                                         </div>
                                         <div className="relative group">
-                                            <div className="w-full bg-slate-50 h-14 pl-12 pr-4 flex items-center rounded-2xl transition-all group-hover:bg-slate-100 ring-1 ring-transparent group-hover:ring-indigo-50">
+                                            <div className="w-full bg-slate-50 h-14 pl-12 pr-4 flex items-center rounded-2xl transition-all group-hover:bg-slate-100 ring-1 ring-transparent group-hover:ring-indigo-100/50">
                                                 <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors pointer-events-none" />
                                                 <select
                                                     value={statusFilter}
