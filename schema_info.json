@@ -1,0 +1,2223 @@
+﻿{
+    "swagger":  "2.0",
+    "info":  {
+                 "description":  "",
+                 "title":  "standard public schema",
+                 "version":  "14.3"
+             },
+    "host":  "0.0.0.0:3000",
+    "basePath":  "/",
+    "schemes":  [
+                    "http"
+                ],
+    "consumes":  [
+                     "application/json",
+                     "application/vnd.pgrst.object+json;nulls=stripped",
+                     "application/vnd.pgrst.object+json",
+                     "text/csv"
+                 ],
+    "produces":  [
+                     "application/json",
+                     "application/vnd.pgrst.object+json;nulls=stripped",
+                     "application/vnd.pgrst.object+json",
+                     "text/csv"
+                 ],
+    "paths":  {
+                  "/":  {
+                            "get":  {
+                                        "produces":  [
+                                                         "application/openapi+json",
+                                                         "application/json"
+                                                     ],
+                                        "responses":  {
+                                                          "200":  {
+                                                                      "description":  "OK"
+                                                                  }
+                                                      },
+                                        "summary":  "OpenAPI description (this document)",
+                                        "tags":  [
+                                                     "Introspection"
+                                                 ]
+                                    }
+                        },
+                  "/sessions":  {
+                                    "get":  {
+                                                "parameters":  [
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.sessions.id"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.sessions.org_id"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.sessions.group_id"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.sessions.date"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.sessions.class_index"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.sessions.created_by"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.sessions.updated_by"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.sessions.meta"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.sessions.created_at"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.sessions.updated_at"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/select"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/order"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/range"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rangeUnit"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/offset"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/limit"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/preferCount"
+                                                                   }
+                                                               ],
+                                                "responses":  {
+                                                                  "200":  {
+                                                                              "description":  "OK",
+                                                                              "schema":  "@{items=; type=array}"
+                                                                          },
+                                                                  "206":  {
+                                                                              "description":  "Partial Content"
+                                                                          }
+                                                              },
+                                                "tags":  [
+                                                             "sessions"
+                                                         ]
+                                            },
+                                    "post":  {
+                                                 "parameters":  [
+                                                                    {
+                                                                        "$ref":  "#/parameters/body.sessions"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/select"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/preferPost"
+                                                                    }
+                                                                ],
+                                                 "responses":  {
+                                                                   "201":  {
+                                                                               "description":  "Created"
+                                                                           }
+                                                               },
+                                                 "tags":  [
+                                                              "sessions"
+                                                          ]
+                                             },
+                                    "delete":  {
+                                                   "parameters":  [
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.sessions.id"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.sessions.org_id"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.sessions.group_id"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.sessions.date"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.sessions.class_index"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.sessions.created_by"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.sessions.updated_by"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.sessions.meta"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.sessions.created_at"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.sessions.updated_at"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/preferReturn"
+                                                                      }
+                                                                  ],
+                                                   "responses":  {
+                                                                     "204":  {
+                                                                                 "description":  "No Content"
+                                                                             }
+                                                                 },
+                                                   "tags":  [
+                                                                "sessions"
+                                                            ]
+                                               },
+                                    "patch":  {
+                                                  "parameters":  [
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.sessions.id"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.sessions.org_id"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.sessions.group_id"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.sessions.date"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.sessions.class_index"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.sessions.created_by"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.sessions.updated_by"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.sessions.meta"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.sessions.created_at"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.sessions.updated_at"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/body.sessions"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/preferReturn"
+                                                                     }
+                                                                 ],
+                                                  "responses":  {
+                                                                    "204":  {
+                                                                                "description":  "No Content"
+                                                                            }
+                                                                },
+                                                  "tags":  [
+                                                               "sessions"
+                                                           ]
+                                              }
+                                },
+                  "/organizations":  {
+                                         "get":  {
+                                                     "parameters":  [
+                                                                        {
+                                                                            "$ref":  "#/parameters/rowFilter.organizations.id"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/rowFilter.organizations.name"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/rowFilter.organizations.slug"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/rowFilter.organizations.settings"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/rowFilter.organizations.created_at"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/rowFilter.organizations.updated_at"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/select"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/order"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/range"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/rangeUnit"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/offset"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/limit"
+                                                                        },
+                                                                        {
+                                                                            "$ref":  "#/parameters/preferCount"
+                                                                        }
+                                                                    ],
+                                                     "responses":  {
+                                                                       "200":  {
+                                                                                   "description":  "OK",
+                                                                                   "schema":  "@{items=; type=array}"
+                                                                               },
+                                                                       "206":  {
+                                                                                   "description":  "Partial Content"
+                                                                               }
+                                                                   },
+                                                     "tags":  [
+                                                                  "organizations"
+                                                              ]
+                                                 },
+                                         "post":  {
+                                                      "parameters":  [
+                                                                         {
+                                                                             "$ref":  "#/parameters/body.organizations"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/select"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/preferPost"
+                                                                         }
+                                                                     ],
+                                                      "responses":  {
+                                                                        "201":  {
+                                                                                    "description":  "Created"
+                                                                                }
+                                                                    },
+                                                      "tags":  [
+                                                                   "organizations"
+                                                               ]
+                                                  },
+                                         "delete":  {
+                                                        "parameters":  [
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.organizations.id"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.organizations.name"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.organizations.slug"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.organizations.settings"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.organizations.created_at"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.organizations.updated_at"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/preferReturn"
+                                                                           }
+                                                                       ],
+                                                        "responses":  {
+                                                                          "204":  {
+                                                                                      "description":  "No Content"
+                                                                                  }
+                                                                      },
+                                                        "tags":  [
+                                                                     "organizations"
+                                                                 ]
+                                                    },
+                                         "patch":  {
+                                                       "parameters":  [
+                                                                          {
+                                                                              "$ref":  "#/parameters/rowFilter.organizations.id"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/rowFilter.organizations.name"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/rowFilter.organizations.slug"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/rowFilter.organizations.settings"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/rowFilter.organizations.created_at"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/rowFilter.organizations.updated_at"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/body.organizations"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/preferReturn"
+                                                                          }
+                                                                      ],
+                                                       "responses":  {
+                                                                         "204":  {
+                                                                                     "description":  "No Content"
+                                                                                 }
+                                                                     },
+                                                       "tags":  [
+                                                                    "organizations"
+                                                                ]
+                                                   }
+                                     },
+                  "/groups":  {
+                                  "get":  {
+                                              "parameters":  [
+                                                                 {
+                                                                     "$ref":  "#/parameters/rowFilter.groups.id"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/rowFilter.groups.org_id"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/rowFilter.groups.academic_year_id"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/rowFilter.groups.name"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/rowFilter.groups.type"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/rowFilter.groups.meta"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/rowFilter.groups.created_at"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/rowFilter.groups.updated_at"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/select"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/order"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/range"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/rangeUnit"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/offset"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/limit"
+                                                                 },
+                                                                 {
+                                                                     "$ref":  "#/parameters/preferCount"
+                                                                 }
+                                                             ],
+                                              "responses":  {
+                                                                "200":  {
+                                                                            "description":  "OK",
+                                                                            "schema":  "@{items=; type=array}"
+                                                                        },
+                                                                "206":  {
+                                                                            "description":  "Partial Content"
+                                                                        }
+                                                            },
+                                              "tags":  [
+                                                           "groups"
+                                                       ]
+                                          },
+                                  "post":  {
+                                               "parameters":  [
+                                                                  {
+                                                                      "$ref":  "#/parameters/body.groups"
+                                                                  },
+                                                                  {
+                                                                      "$ref":  "#/parameters/select"
+                                                                  },
+                                                                  {
+                                                                      "$ref":  "#/parameters/preferPost"
+                                                                  }
+                                                              ],
+                                               "responses":  {
+                                                                 "201":  {
+                                                                             "description":  "Created"
+                                                                         }
+                                                             },
+                                               "tags":  [
+                                                            "groups"
+                                                        ]
+                                           },
+                                  "delete":  {
+                                                 "parameters":  [
+                                                                    {
+                                                                        "$ref":  "#/parameters/rowFilter.groups.id"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/rowFilter.groups.org_id"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/rowFilter.groups.academic_year_id"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/rowFilter.groups.name"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/rowFilter.groups.type"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/rowFilter.groups.meta"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/rowFilter.groups.created_at"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/rowFilter.groups.updated_at"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/preferReturn"
+                                                                    }
+                                                                ],
+                                                 "responses":  {
+                                                                   "204":  {
+                                                                               "description":  "No Content"
+                                                                           }
+                                                               },
+                                                 "tags":  [
+                                                              "groups"
+                                                          ]
+                                             },
+                                  "patch":  {
+                                                "parameters":  [
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.groups.id"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.groups.org_id"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.groups.academic_year_id"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.groups.name"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.groups.type"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.groups.meta"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.groups.created_at"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.groups.updated_at"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/body.groups"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/preferReturn"
+                                                                   }
+                                                               ],
+                                                "responses":  {
+                                                                  "204":  {
+                                                                              "description":  "No Content"
+                                                                          }
+                                                              },
+                                                "tags":  [
+                                                             "groups"
+                                                         ]
+                                            }
+                              },
+                  "/academic_years":  {
+                                          "get":  {
+                                                      "parameters":  [
+                                                                         {
+                                                                             "$ref":  "#/parameters/rowFilter.academic_years.id"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/rowFilter.academic_years.org_id"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/rowFilter.academic_years.year"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/rowFilter.academic_years.is_active"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/rowFilter.academic_years.created_at"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/select"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/order"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/range"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/rangeUnit"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/offset"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/limit"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/preferCount"
+                                                                         }
+                                                                     ],
+                                                      "responses":  {
+                                                                        "200":  {
+                                                                                    "description":  "OK",
+                                                                                    "schema":  "@{items=; type=array}"
+                                                                                },
+                                                                        "206":  {
+                                                                                    "description":  "Partial Content"
+                                                                                }
+                                                                    },
+                                                      "tags":  [
+                                                                   "academic_years"
+                                                               ]
+                                                  },
+                                          "post":  {
+                                                       "parameters":  [
+                                                                          {
+                                                                              "$ref":  "#/parameters/body.academic_years"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/select"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/preferPost"
+                                                                          }
+                                                                      ],
+                                                       "responses":  {
+                                                                         "201":  {
+                                                                                     "description":  "Created"
+                                                                                 }
+                                                                     },
+                                                       "tags":  [
+                                                                    "academic_years"
+                                                                ]
+                                                   },
+                                          "delete":  {
+                                                         "parameters":  [
+                                                                            {
+                                                                                "$ref":  "#/parameters/rowFilter.academic_years.id"
+                                                                            },
+                                                                            {
+                                                                                "$ref":  "#/parameters/rowFilter.academic_years.org_id"
+                                                                            },
+                                                                            {
+                                                                                "$ref":  "#/parameters/rowFilter.academic_years.year"
+                                                                            },
+                                                                            {
+                                                                                "$ref":  "#/parameters/rowFilter.academic_years.is_active"
+                                                                            },
+                                                                            {
+                                                                                "$ref":  "#/parameters/rowFilter.academic_years.created_at"
+                                                                            },
+                                                                            {
+                                                                                "$ref":  "#/parameters/preferReturn"
+                                                                            }
+                                                                        ],
+                                                         "responses":  {
+                                                                           "204":  {
+                                                                                       "description":  "No Content"
+                                                                                   }
+                                                                       },
+                                                         "tags":  [
+                                                                      "academic_years"
+                                                                  ]
+                                                     },
+                                          "patch":  {
+                                                        "parameters":  [
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.academic_years.id"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.academic_years.org_id"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.academic_years.year"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.academic_years.is_active"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.academic_years.created_at"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/body.academic_years"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/preferReturn"
+                                                                           }
+                                                                       ],
+                                                        "responses":  {
+                                                                          "204":  {
+                                                                                      "description":  "No Content"
+                                                                                  }
+                                                                      },
+                                                        "tags":  [
+                                                                     "academic_years"
+                                                                 ]
+                                                    }
+                                      },
+                  "/attendance_records":  {
+                                              "get":  {
+                                                          "parameters":  [
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rowFilter.attendance_records.id"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rowFilter.attendance_records.org_id"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rowFilter.attendance_records.session_id"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rowFilter.attendance_records.student_id"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rowFilter.attendance_records.status"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rowFilter.attendance_records.justification"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rowFilter.attendance_records.comment"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rowFilter.attendance_records.updated_by"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rowFilter.attendance_records.created_at"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rowFilter.attendance_records.updated_at"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/select"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/order"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/range"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/rangeUnit"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/offset"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/limit"
+                                                                             },
+                                                                             {
+                                                                                 "$ref":  "#/parameters/preferCount"
+                                                                             }
+                                                                         ],
+                                                          "responses":  {
+                                                                            "200":  {
+                                                                                        "description":  "OK",
+                                                                                        "schema":  "@{items=; type=array}"
+                                                                                    },
+                                                                            "206":  {
+                                                                                        "description":  "Partial Content"
+                                                                                    }
+                                                                        },
+                                                          "tags":  [
+                                                                       "attendance_records"
+                                                                   ]
+                                                      },
+                                              "post":  {
+                                                           "parameters":  [
+                                                                              {
+                                                                                  "$ref":  "#/parameters/body.attendance_records"
+                                                                              },
+                                                                              {
+                                                                                  "$ref":  "#/parameters/select"
+                                                                              },
+                                                                              {
+                                                                                  "$ref":  "#/parameters/preferPost"
+                                                                              }
+                                                                          ],
+                                                           "responses":  {
+                                                                             "201":  {
+                                                                                         "description":  "Created"
+                                                                                     }
+                                                                         },
+                                                           "tags":  [
+                                                                        "attendance_records"
+                                                                    ]
+                                                       },
+                                              "delete":  {
+                                                             "parameters":  [
+                                                                                {
+                                                                                    "$ref":  "#/parameters/rowFilter.attendance_records.id"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/rowFilter.attendance_records.org_id"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/rowFilter.attendance_records.session_id"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/rowFilter.attendance_records.student_id"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/rowFilter.attendance_records.status"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/rowFilter.attendance_records.justification"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/rowFilter.attendance_records.comment"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/rowFilter.attendance_records.updated_by"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/rowFilter.attendance_records.created_at"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/rowFilter.attendance_records.updated_at"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/preferReturn"
+                                                                                }
+                                                                            ],
+                                                             "responses":  {
+                                                                               "204":  {
+                                                                                           "description":  "No Content"
+                                                                                       }
+                                                                           },
+                                                             "tags":  [
+                                                                          "attendance_records"
+                                                                      ]
+                                                         },
+                                              "patch":  {
+                                                            "parameters":  [
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.attendance_records.id"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.attendance_records.org_id"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.attendance_records.session_id"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.attendance_records.student_id"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.attendance_records.status"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.attendance_records.justification"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.attendance_records.comment"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.attendance_records.updated_by"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.attendance_records.created_at"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.attendance_records.updated_at"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/body.attendance_records"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/preferReturn"
+                                                                               }
+                                                                           ],
+                                                            "responses":  {
+                                                                              "204":  {
+                                                                                          "description":  "No Content"
+                                                                                      }
+                                                                          },
+                                                            "tags":  [
+                                                                         "attendance_records"
+                                                                     ]
+                                                        }
+                                          },
+                  "/students":  {
+                                    "get":  {
+                                                "parameters":  [
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.students.id"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.students.org_id"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.students.first_name"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.students.last_name"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.students.dni"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.students.doc_id"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.students.notes"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.students.is_active"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.students.created_at"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rowFilter.students.updated_at"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/select"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/order"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/range"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/rangeUnit"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/offset"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/limit"
+                                                                   },
+                                                                   {
+                                                                       "$ref":  "#/parameters/preferCount"
+                                                                   }
+                                                               ],
+                                                "responses":  {
+                                                                  "200":  {
+                                                                              "description":  "OK",
+                                                                              "schema":  "@{items=; type=array}"
+                                                                          },
+                                                                  "206":  {
+                                                                              "description":  "Partial Content"
+                                                                          }
+                                                              },
+                                                "tags":  [
+                                                             "students"
+                                                         ]
+                                            },
+                                    "post":  {
+                                                 "parameters":  [
+                                                                    {
+                                                                        "$ref":  "#/parameters/body.students"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/select"
+                                                                    },
+                                                                    {
+                                                                        "$ref":  "#/parameters/preferPost"
+                                                                    }
+                                                                ],
+                                                 "responses":  {
+                                                                   "201":  {
+                                                                               "description":  "Created"
+                                                                           }
+                                                               },
+                                                 "tags":  [
+                                                              "students"
+                                                          ]
+                                             },
+                                    "delete":  {
+                                                   "parameters":  [
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.students.id"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.students.org_id"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.students.first_name"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.students.last_name"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.students.dni"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.students.doc_id"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.students.notes"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.students.is_active"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.students.created_at"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/rowFilter.students.updated_at"
+                                                                      },
+                                                                      {
+                                                                          "$ref":  "#/parameters/preferReturn"
+                                                                      }
+                                                                  ],
+                                                   "responses":  {
+                                                                     "204":  {
+                                                                                 "description":  "No Content"
+                                                                             }
+                                                                 },
+                                                   "tags":  [
+                                                                "students"
+                                                            ]
+                                               },
+                                    "patch":  {
+                                                  "parameters":  [
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.students.id"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.students.org_id"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.students.first_name"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.students.last_name"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.students.dni"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.students.doc_id"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.students.notes"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.students.is_active"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.students.created_at"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/rowFilter.students.updated_at"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/body.students"
+                                                                     },
+                                                                     {
+                                                                         "$ref":  "#/parameters/preferReturn"
+                                                                     }
+                                                                 ],
+                                                  "responses":  {
+                                                                    "204":  {
+                                                                                "description":  "No Content"
+                                                                            }
+                                                                },
+                                                  "tags":  [
+                                                               "students"
+                                                           ]
+                                              }
+                                },
+                  "/group_students":  {
+                                          "get":  {
+                                                      "parameters":  [
+                                                                         {
+                                                                             "$ref":  "#/parameters/rowFilter.group_students.id"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/rowFilter.group_students.group_id"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/rowFilter.group_students.student_id"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/rowFilter.group_students.is_active"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/rowFilter.group_students.created_at"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/select"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/order"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/range"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/rangeUnit"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/offset"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/limit"
+                                                                         },
+                                                                         {
+                                                                             "$ref":  "#/parameters/preferCount"
+                                                                         }
+                                                                     ],
+                                                      "responses":  {
+                                                                        "200":  {
+                                                                                    "description":  "OK",
+                                                                                    "schema":  "@{items=; type=array}"
+                                                                                },
+                                                                        "206":  {
+                                                                                    "description":  "Partial Content"
+                                                                                }
+                                                                    },
+                                                      "tags":  [
+                                                                   "group_students"
+                                                               ]
+                                                  },
+                                          "post":  {
+                                                       "parameters":  [
+                                                                          {
+                                                                              "$ref":  "#/parameters/body.group_students"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/select"
+                                                                          },
+                                                                          {
+                                                                              "$ref":  "#/parameters/preferPost"
+                                                                          }
+                                                                      ],
+                                                       "responses":  {
+                                                                         "201":  {
+                                                                                     "description":  "Created"
+                                                                                 }
+                                                                     },
+                                                       "tags":  [
+                                                                    "group_students"
+                                                                ]
+                                                   },
+                                          "delete":  {
+                                                         "parameters":  [
+                                                                            {
+                                                                                "$ref":  "#/parameters/rowFilter.group_students.id"
+                                                                            },
+                                                                            {
+                                                                                "$ref":  "#/parameters/rowFilter.group_students.group_id"
+                                                                            },
+                                                                            {
+                                                                                "$ref":  "#/parameters/rowFilter.group_students.student_id"
+                                                                            },
+                                                                            {
+                                                                                "$ref":  "#/parameters/rowFilter.group_students.is_active"
+                                                                            },
+                                                                            {
+                                                                                "$ref":  "#/parameters/rowFilter.group_students.created_at"
+                                                                            },
+                                                                            {
+                                                                                "$ref":  "#/parameters/preferReturn"
+                                                                            }
+                                                                        ],
+                                                         "responses":  {
+                                                                           "204":  {
+                                                                                       "description":  "No Content"
+                                                                                   }
+                                                                       },
+                                                         "tags":  [
+                                                                      "group_students"
+                                                                  ]
+                                                     },
+                                          "patch":  {
+                                                        "parameters":  [
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.group_students.id"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.group_students.group_id"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.group_students.student_id"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.group_students.is_active"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/rowFilter.group_students.created_at"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/body.group_students"
+                                                                           },
+                                                                           {
+                                                                               "$ref":  "#/parameters/preferReturn"
+                                                                           }
+                                                                       ],
+                                                        "responses":  {
+                                                                          "204":  {
+                                                                                      "description":  "No Content"
+                                                                                  }
+                                                                      },
+                                                        "tags":  [
+                                                                     "group_students"
+                                                                 ]
+                                                    }
+                                      },
+                  "/organization_members":  {
+                                                "get":  {
+                                                            "parameters":  [
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.organization_members.id"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.organization_members.org_id"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.organization_members.user_id"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.organization_members.role"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rowFilter.organization_members.created_at"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/select"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/order"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/range"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/rangeUnit"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/offset"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/limit"
+                                                                               },
+                                                                               {
+                                                                                   "$ref":  "#/parameters/preferCount"
+                                                                               }
+                                                                           ],
+                                                            "responses":  {
+                                                                              "200":  {
+                                                                                          "description":  "OK",
+                                                                                          "schema":  "@{items=; type=array}"
+                                                                                      },
+                                                                              "206":  {
+                                                                                          "description":  "Partial Content"
+                                                                                      }
+                                                                          },
+                                                            "tags":  [
+                                                                         "organization_members"
+                                                                     ]
+                                                        },
+                                                "post":  {
+                                                             "parameters":  [
+                                                                                {
+                                                                                    "$ref":  "#/parameters/body.organization_members"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/select"
+                                                                                },
+                                                                                {
+                                                                                    "$ref":  "#/parameters/preferPost"
+                                                                                }
+                                                                            ],
+                                                             "responses":  {
+                                                                               "201":  {
+                                                                                           "description":  "Created"
+                                                                                       }
+                                                                           },
+                                                             "tags":  [
+                                                                          "organization_members"
+                                                                      ]
+                                                         },
+                                                "delete":  {
+                                                               "parameters":  [
+                                                                                  {
+                                                                                      "$ref":  "#/parameters/rowFilter.organization_members.id"
+                                                                                  },
+                                                                                  {
+                                                                                      "$ref":  "#/parameters/rowFilter.organization_members.org_id"
+                                                                                  },
+                                                                                  {
+                                                                                      "$ref":  "#/parameters/rowFilter.organization_members.user_id"
+                                                                                  },
+                                                                                  {
+                                                                                      "$ref":  "#/parameters/rowFilter.organization_members.role"
+                                                                                  },
+                                                                                  {
+                                                                                      "$ref":  "#/parameters/rowFilter.organization_members.created_at"
+                                                                                  },
+                                                                                  {
+                                                                                      "$ref":  "#/parameters/preferReturn"
+                                                                                  }
+                                                                              ],
+                                                               "responses":  {
+                                                                                 "204":  {
+                                                                                             "description":  "No Content"
+                                                                                         }
+                                                                             },
+                                                               "tags":  [
+                                                                            "organization_members"
+                                                                        ]
+                                                           },
+                                                "patch":  {
+                                                              "parameters":  [
+                                                                                 {
+                                                                                     "$ref":  "#/parameters/rowFilter.organization_members.id"
+                                                                                 },
+                                                                                 {
+                                                                                     "$ref":  "#/parameters/rowFilter.organization_members.org_id"
+                                                                                 },
+                                                                                 {
+                                                                                     "$ref":  "#/parameters/rowFilter.organization_members.user_id"
+                                                                                 },
+                                                                                 {
+                                                                                     "$ref":  "#/parameters/rowFilter.organization_members.role"
+                                                                                 },
+                                                                                 {
+                                                                                     "$ref":  "#/parameters/rowFilter.organization_members.created_at"
+                                                                                 },
+                                                                                 {
+                                                                                     "$ref":  "#/parameters/body.organization_members"
+                                                                                 },
+                                                                                 {
+                                                                                     "$ref":  "#/parameters/preferReturn"
+                                                                                 }
+                                                                             ],
+                                                              "responses":  {
+                                                                                "204":  {
+                                                                                            "description":  "No Content"
+                                                                                        }
+                                                                            },
+                                                              "tags":  [
+                                                                           "organization_members"
+                                                                       ]
+                                                          }
+                                            },
+                  "/rpc/get_daily_attendance_summary":  {
+                                                            "post":  {
+                                                                         "parameters":  [
+                                                                                            {
+                                                                                                "in":  "body",
+                                                                                                "name":  "args",
+                                                                                                "required":  true,
+                                                                                                "schema":  "@{properties=; required=System.Object[]; type=object}"
+                                                                                            },
+                                                                                            {
+                                                                                                "$ref":  "#/parameters/preferParams"
+                                                                                            }
+                                                                                        ],
+                                                                         "produces":  [
+                                                                                          "application/json",
+                                                                                          "application/vnd.pgrst.object+json;nulls=stripped",
+                                                                                          "application/vnd.pgrst.object+json"
+                                                                                      ],
+                                                                         "responses":  {
+                                                                                           "200":  {
+                                                                                                       "description":  "OK"
+                                                                                                   }
+                                                                                       },
+                                                                         "tags":  [
+                                                                                      "(rpc) get_daily_attendance_summary"
+                                                                                  ]
+                                                                     }
+                                                        }
+              },
+    "definitions":  {
+                        "sessions":  {
+                                         "required":  [
+                                                          "id"
+                                                      ],
+                                         "properties":  {
+                                                            "id":  {
+                                                                       "default":  "gen_random_uuid()",
+                                                                       "description":  "Note:\nThis is a Primary Key.\u003cpk/\u003e",
+                                                                       "format":  "uuid",
+                                                                       "type":  "string"
+                                                                   },
+                                                            "org_id":  {
+                                                                           "description":  "Note:\nThis is a Foreign Key to `organizations.id`.\u003cfk table=\u0027organizations\u0027 column=\u0027id\u0027/\u003e",
+                                                                           "format":  "uuid",
+                                                                           "type":  "string"
+                                                                       },
+                                                            "group_id":  {
+                                                                             "description":  "Note:\nThis is a Foreign Key to `groups.id`.\u003cfk table=\u0027groups\u0027 column=\u0027id\u0027/\u003e",
+                                                                             "format":  "uuid",
+                                                                             "type":  "string"
+                                                                         },
+                                                            "date":  {
+                                                                         "default":  "CURRENT_DATE",
+                                                                         "format":  "date",
+                                                                         "type":  "string"
+                                                                     },
+                                                            "class_index":  {
+                                                                                "default":  1,
+                                                                                "format":  "integer",
+                                                                                "type":  "integer"
+                                                                            },
+                                                            "created_by":  {
+                                                                               "format":  "uuid",
+                                                                               "type":  "string"
+                                                                           },
+                                                            "updated_by":  {
+                                                                               "format":  "uuid",
+                                                                               "type":  "string"
+                                                                           },
+                                                            "meta":  {
+                                                                         "format":  "jsonb"
+                                                                     },
+                                                            "created_at":  {
+                                                                               "default":  "now()",
+                                                                               "format":  "timestamp with time zone",
+                                                                               "type":  "string"
+                                                                           },
+                                                            "updated_at":  {
+                                                                               "default":  "now()",
+                                                                               "format":  "timestamp with time zone",
+                                                                               "type":  "string"
+                                                                           }
+                                                        },
+                                         "type":  "object"
+                                     },
+                        "organizations":  {
+                                              "required":  [
+                                                               "id",
+                                                               "name",
+                                                               "slug"
+                                                           ],
+                                              "properties":  {
+                                                                 "id":  {
+                                                                            "default":  "gen_random_uuid()",
+                                                                            "description":  "Note:\nThis is a Primary Key.\u003cpk/\u003e",
+                                                                            "format":  "uuid",
+                                                                            "type":  "string"
+                                                                        },
+                                                                 "name":  {
+                                                                              "format":  "text",
+                                                                              "type":  "string"
+                                                                          },
+                                                                 "slug":  {
+                                                                              "format":  "text",
+                                                                              "type":  "string"
+                                                                          },
+                                                                 "settings":  {
+                                                                                  "format":  "jsonb"
+                                                                              },
+                                                                 "created_at":  {
+                                                                                    "default":  "now()",
+                                                                                    "format":  "timestamp with time zone",
+                                                                                    "type":  "string"
+                                                                                },
+                                                                 "updated_at":  {
+                                                                                    "default":  "now()",
+                                                                                    "format":  "timestamp with time zone",
+                                                                                    "type":  "string"
+                                                                                }
+                                                             },
+                                              "type":  "object"
+                                          },
+                        "groups":  {
+                                       "required":  [
+                                                        "id",
+                                                        "name"
+                                                    ],
+                                       "properties":  {
+                                                          "id":  {
+                                                                     "default":  "gen_random_uuid()",
+                                                                     "description":  "Note:\nThis is a Primary Key.\u003cpk/\u003e",
+                                                                     "format":  "uuid",
+                                                                     "type":  "string"
+                                                                 },
+                                                          "org_id":  {
+                                                                         "description":  "Note:\nThis is a Foreign Key to `organizations.id`.\u003cfk table=\u0027organizations\u0027 column=\u0027id\u0027/\u003e",
+                                                                         "format":  "uuid",
+                                                                         "type":  "string"
+                                                                     },
+                                                          "academic_year_id":  {
+                                                                                   "description":  "Note:\nThis is a Foreign Key to `academic_years.id`.\u003cfk table=\u0027academic_years\u0027 column=\u0027id\u0027/\u003e",
+                                                                                   "format":  "uuid",
+                                                                                   "type":  "string"
+                                                                               },
+                                                          "name":  {
+                                                                       "format":  "text",
+                                                                       "type":  "string"
+                                                                   },
+                                                          "type":  {
+                                                                       "format":  "text",
+                                                                       "type":  "string"
+                                                                   },
+                                                          "meta":  {
+                                                                       "format":  "jsonb"
+                                                                   },
+                                                          "created_at":  {
+                                                                             "default":  "now()",
+                                                                             "format":  "timestamp with time zone",
+                                                                             "type":  "string"
+                                                                         },
+                                                          "updated_at":  {
+                                                                             "default":  "now()",
+                                                                             "format":  "timestamp with time zone",
+                                                                             "type":  "string"
+                                                                         }
+                                                      },
+                                       "type":  "object"
+                                   },
+                        "academic_years":  {
+                                               "required":  [
+                                                                "id",
+                                                                "year"
+                                                            ],
+                                               "properties":  {
+                                                                  "id":  {
+                                                                             "default":  "gen_random_uuid()",
+                                                                             "description":  "Note:\nThis is a Primary Key.\u003cpk/\u003e",
+                                                                             "format":  "uuid",
+                                                                             "type":  "string"
+                                                                         },
+                                                                  "org_id":  {
+                                                                                 "description":  "Note:\nThis is a Foreign Key to `organizations.id`.\u003cfk table=\u0027organizations\u0027 column=\u0027id\u0027/\u003e",
+                                                                                 "format":  "uuid",
+                                                                                 "type":  "string"
+                                                                             },
+                                                                  "year":  {
+                                                                               "format":  "integer",
+                                                                               "type":  "integer"
+                                                                           },
+                                                                  "is_active":  {
+                                                                                    "default":  true,
+                                                                                    "format":  "boolean",
+                                                                                    "type":  "boolean"
+                                                                                },
+                                                                  "created_at":  {
+                                                                                     "default":  "now()",
+                                                                                     "format":  "timestamp with time zone",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                              },
+                                               "type":  "object"
+                                           },
+                        "attendance_records":  {
+                                                   "required":  [
+                                                                    "id"
+                                                                ],
+                                                   "properties":  {
+                                                                      "id":  {
+                                                                                 "default":  "gen_random_uuid()",
+                                                                                 "description":  "Note:\nThis is a Primary Key.\u003cpk/\u003e",
+                                                                                 "format":  "uuid",
+                                                                                 "type":  "string"
+                                                                             },
+                                                                      "org_id":  {
+                                                                                     "description":  "Note:\nThis is a Foreign Key to `organizations.id`.\u003cfk table=\u0027organizations\u0027 column=\u0027id\u0027/\u003e",
+                                                                                     "format":  "uuid",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                      "session_id":  {
+                                                                                         "description":  "Note:\nThis is a Foreign Key to `sessions.id`.\u003cfk table=\u0027sessions\u0027 column=\u0027id\u0027/\u003e",
+                                                                                         "format":  "uuid",
+                                                                                         "type":  "string"
+                                                                                     },
+                                                                      "student_id":  {
+                                                                                         "description":  "Note:\nThis is a Foreign Key to `students.id`.\u003cfk table=\u0027students\u0027 column=\u0027id\u0027/\u003e",
+                                                                                         "format":  "uuid",
+                                                                                         "type":  "string"
+                                                                                     },
+                                                                      "status":  {
+                                                                                     "format":  "text",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                      "justification":  {
+                                                                                            "format":  "text",
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                      "comment":  {
+                                                                                      "format":  "text",
+                                                                                      "type":  "string"
+                                                                                  },
+                                                                      "updated_by":  {
+                                                                                         "format":  "uuid",
+                                                                                         "type":  "string"
+                                                                                     },
+                                                                      "created_at":  {
+                                                                                         "default":  "now()",
+                                                                                         "format":  "timestamp with time zone",
+                                                                                         "type":  "string"
+                                                                                     },
+                                                                      "updated_at":  {
+                                                                                         "default":  "now()",
+                                                                                         "format":  "timestamp with time zone",
+                                                                                         "type":  "string"
+                                                                                     }
+                                                                  },
+                                                   "type":  "object"
+                                               },
+                        "students":  {
+                                         "required":  [
+                                                          "id",
+                                                          "first_name",
+                                                          "last_name"
+                                                      ],
+                                         "properties":  {
+                                                            "id":  {
+                                                                       "default":  "gen_random_uuid()",
+                                                                       "description":  "Note:\nThis is a Primary Key.\u003cpk/\u003e",
+                                                                       "format":  "uuid",
+                                                                       "type":  "string"
+                                                                   },
+                                                            "org_id":  {
+                                                                           "description":  "Note:\nThis is a Foreign Key to `organizations.id`.\u003cfk table=\u0027organizations\u0027 column=\u0027id\u0027/\u003e",
+                                                                           "format":  "uuid",
+                                                                           "type":  "string"
+                                                                       },
+                                                            "first_name":  {
+                                                                               "format":  "text",
+                                                                               "type":  "string"
+                                                                           },
+                                                            "last_name":  {
+                                                                              "format":  "text",
+                                                                              "type":  "string"
+                                                                          },
+                                                            "dni":  {
+                                                                        "format":  "text",
+                                                                        "type":  "string"
+                                                                    },
+                                                            "doc_id":  {
+                                                                           "format":  "text",
+                                                                           "type":  "string"
+                                                                       },
+                                                            "notes":  {
+                                                                          "format":  "text",
+                                                                          "type":  "string"
+                                                                      },
+                                                            "is_active":  {
+                                                                              "default":  true,
+                                                                              "format":  "boolean",
+                                                                              "type":  "boolean"
+                                                                          },
+                                                            "created_at":  {
+                                                                               "default":  "now()",
+                                                                               "format":  "timestamp with time zone",
+                                                                               "type":  "string"
+                                                                           },
+                                                            "updated_at":  {
+                                                                               "default":  "now()",
+                                                                               "format":  "timestamp with time zone",
+                                                                               "type":  "string"
+                                                                           }
+                                                        },
+                                         "type":  "object"
+                                     },
+                        "group_students":  {
+                                               "required":  [
+                                                                "id"
+                                                            ],
+                                               "properties":  {
+                                                                  "id":  {
+                                                                             "default":  "gen_random_uuid()",
+                                                                             "description":  "Note:\nThis is a Primary Key.\u003cpk/\u003e",
+                                                                             "format":  "uuid",
+                                                                             "type":  "string"
+                                                                         },
+                                                                  "group_id":  {
+                                                                                   "description":  "Note:\nThis is a Foreign Key to `groups.id`.\u003cfk table=\u0027groups\u0027 column=\u0027id\u0027/\u003e",
+                                                                                   "format":  "uuid",
+                                                                                   "type":  "string"
+                                                                               },
+                                                                  "student_id":  {
+                                                                                     "description":  "Note:\nThis is a Foreign Key to `students.id`.\u003cfk table=\u0027students\u0027 column=\u0027id\u0027/\u003e",
+                                                                                     "format":  "uuid",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                  "is_active":  {
+                                                                                    "default":  true,
+                                                                                    "format":  "boolean",
+                                                                                    "type":  "boolean"
+                                                                                },
+                                                                  "created_at":  {
+                                                                                     "default":  "now()",
+                                                                                     "format":  "timestamp with time zone",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                              },
+                                               "type":  "object"
+                                           },
+                        "organization_members":  {
+                                                     "required":  [
+                                                                      "id"
+                                                                  ],
+                                                     "properties":  {
+                                                                        "id":  {
+                                                                                   "default":  "gen_random_uuid()",
+                                                                                   "description":  "Note:\nThis is a Primary Key.\u003cpk/\u003e",
+                                                                                   "format":  "uuid",
+                                                                                   "type":  "string"
+                                                                               },
+                                                                        "org_id":  {
+                                                                                       "description":  "Note:\nThis is a Foreign Key to `organizations.id`.\u003cfk table=\u0027organizations\u0027 column=\u0027id\u0027/\u003e",
+                                                                                       "format":  "uuid",
+                                                                                       "type":  "string"
+                                                                                   },
+                                                                        "user_id":  {
+                                                                                        "format":  "uuid",
+                                                                                        "type":  "string"
+                                                                                    },
+                                                                        "role":  {
+                                                                                     "format":  "text",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                        "created_at":  {
+                                                                                           "default":  "now()",
+                                                                                           "format":  "timestamp with time zone",
+                                                                                           "type":  "string"
+                                                                                       }
+                                                                    },
+                                                     "type":  "object"
+                                                 }
+                    },
+    "parameters":  {
+                       "preferParams":  {
+                                            "name":  "Prefer",
+                                            "description":  "Preference",
+                                            "required":  false,
+                                            "in":  "header",
+                                            "type":  "string"
+                                        },
+                       "preferReturn":  {
+                                            "name":  "Prefer",
+                                            "description":  "Preference",
+                                            "required":  false,
+                                            "enum":  [
+                                                         "return=representation",
+                                                         "return=minimal",
+                                                         "return=none"
+                                                     ],
+                                            "in":  "header",
+                                            "type":  "string"
+                                        },
+                       "preferCount":  {
+                                           "name":  "Prefer",
+                                           "description":  "Preference",
+                                           "required":  false,
+                                           "enum":  [
+                                                        "count=none"
+                                                    ],
+                                           "in":  "header",
+                                           "type":  "string"
+                                       },
+                       "preferPost":  {
+                                          "name":  "Prefer",
+                                          "description":  "Preference",
+                                          "required":  false,
+                                          "enum":  [
+                                                       "return=representation",
+                                                       "return=minimal",
+                                                       "return=none",
+                                                       "resolution=ignore-duplicates",
+                                                       "resolution=merge-duplicates"
+                                                   ],
+                                          "in":  "header",
+                                          "type":  "string"
+                                      },
+                       "select":  {
+                                      "name":  "select",
+                                      "description":  "Filtering Columns",
+                                      "required":  false,
+                                      "in":  "query",
+                                      "type":  "string"
+                                  },
+                       "on_conflict":  {
+                                           "name":  "on_conflict",
+                                           "description":  "On Conflict",
+                                           "required":  false,
+                                           "in":  "query",
+                                           "type":  "string"
+                                       },
+                       "order":  {
+                                     "name":  "order",
+                                     "description":  "Ordering",
+                                     "required":  false,
+                                     "in":  "query",
+                                     "type":  "string"
+                                 },
+                       "range":  {
+                                     "name":  "Range",
+                                     "description":  "Limiting and Pagination",
+                                     "required":  false,
+                                     "in":  "header",
+                                     "type":  "string"
+                                 },
+                       "rangeUnit":  {
+                                         "name":  "Range-Unit",
+                                         "description":  "Limiting and Pagination",
+                                         "required":  false,
+                                         "default":  "items",
+                                         "in":  "header",
+                                         "type":  "string"
+                                     },
+                       "offset":  {
+                                      "name":  "offset",
+                                      "description":  "Limiting and Pagination",
+                                      "required":  false,
+                                      "in":  "query",
+                                      "type":  "string"
+                                  },
+                       "limit":  {
+                                     "name":  "limit",
+                                     "description":  "Limiting and Pagination",
+                                     "required":  false,
+                                     "in":  "query",
+                                     "type":  "string"
+                                 },
+                       "body.sessions":  {
+                                             "name":  "sessions",
+                                             "description":  "sessions",
+                                             "required":  false,
+                                             "in":  "body",
+                                             "schema":  {
+                                                            "$ref":  "#/definitions/sessions"
+                                                        }
+                                         },
+                       "rowFilter.sessions.id":  {
+                                                     "name":  "id",
+                                                     "required":  false,
+                                                     "in":  "query",
+                                                     "type":  "string"
+                                                 },
+                       "rowFilter.sessions.org_id":  {
+                                                         "name":  "org_id",
+                                                         "required":  false,
+                                                         "in":  "query",
+                                                         "type":  "string"
+                                                     },
+                       "rowFilter.sessions.group_id":  {
+                                                           "name":  "group_id",
+                                                           "required":  false,
+                                                           "in":  "query",
+                                                           "type":  "string"
+                                                       },
+                       "rowFilter.sessions.date":  {
+                                                       "name":  "date",
+                                                       "required":  false,
+                                                       "in":  "query",
+                                                       "type":  "string"
+                                                   },
+                       "rowFilter.sessions.class_index":  {
+                                                              "name":  "class_index",
+                                                              "required":  false,
+                                                              "in":  "query",
+                                                              "type":  "string"
+                                                          },
+                       "rowFilter.sessions.created_by":  {
+                                                             "name":  "created_by",
+                                                             "required":  false,
+                                                             "in":  "query",
+                                                             "type":  "string"
+                                                         },
+                       "rowFilter.sessions.updated_by":  {
+                                                             "name":  "updated_by",
+                                                             "required":  false,
+                                                             "in":  "query",
+                                                             "type":  "string"
+                                                         },
+                       "rowFilter.sessions.meta":  {
+                                                       "name":  "meta",
+                                                       "required":  false,
+                                                       "in":  "query",
+                                                       "type":  "string"
+                                                   },
+                       "rowFilter.sessions.created_at":  {
+                                                             "name":  "created_at",
+                                                             "required":  false,
+                                                             "in":  "query",
+                                                             "type":  "string"
+                                                         },
+                       "rowFilter.sessions.updated_at":  {
+                                                             "name":  "updated_at",
+                                                             "required":  false,
+                                                             "in":  "query",
+                                                             "type":  "string"
+                                                         },
+                       "body.organizations":  {
+                                                  "name":  "organizations",
+                                                  "description":  "organizations",
+                                                  "required":  false,
+                                                  "in":  "body",
+                                                  "schema":  {
+                                                                 "$ref":  "#/definitions/organizations"
+                                                             }
+                                              },
+                       "rowFilter.organizations.id":  {
+                                                          "name":  "id",
+                                                          "required":  false,
+                                                          "in":  "query",
+                                                          "type":  "string"
+                                                      },
+                       "rowFilter.organizations.name":  {
+                                                            "name":  "name",
+                                                            "required":  false,
+                                                            "in":  "query",
+                                                            "type":  "string"
+                                                        },
+                       "rowFilter.organizations.slug":  {
+                                                            "name":  "slug",
+                                                            "required":  false,
+                                                            "in":  "query",
+                                                            "type":  "string"
+                                                        },
+                       "rowFilter.organizations.settings":  {
+                                                                "name":  "settings",
+                                                                "required":  false,
+                                                                "in":  "query",
+                                                                "type":  "string"
+                                                            },
+                       "rowFilter.organizations.created_at":  {
+                                                                  "name":  "created_at",
+                                                                  "required":  false,
+                                                                  "in":  "query",
+                                                                  "type":  "string"
+                                                              },
+                       "rowFilter.organizations.updated_at":  {
+                                                                  "name":  "updated_at",
+                                                                  "required":  false,
+                                                                  "in":  "query",
+                                                                  "type":  "string"
+                                                              },
+                       "body.groups":  {
+                                           "name":  "groups",
+                                           "description":  "groups",
+                                           "required":  false,
+                                           "in":  "body",
+                                           "schema":  {
+                                                          "$ref":  "#/definitions/groups"
+                                                      }
+                                       },
+                       "rowFilter.groups.id":  {
+                                                   "name":  "id",
+                                                   "required":  false,
+                                                   "in":  "query",
+                                                   "type":  "string"
+                                               },
+                       "rowFilter.groups.org_id":  {
+                                                       "name":  "org_id",
+                                                       "required":  false,
+                                                       "in":  "query",
+                                                       "type":  "string"
+                                                   },
+                       "rowFilter.groups.academic_year_id":  {
+                                                                 "name":  "academic_year_id",
+                                                                 "required":  false,
+                                                                 "in":  "query",
+                                                                 "type":  "string"
+                                                             },
+                       "rowFilter.groups.name":  {
+                                                     "name":  "name",
+                                                     "required":  false,
+                                                     "in":  "query",
+                                                     "type":  "string"
+                                                 },
+                       "rowFilter.groups.type":  {
+                                                     "name":  "type",
+                                                     "required":  false,
+                                                     "in":  "query",
+                                                     "type":  "string"
+                                                 },
+                       "rowFilter.groups.meta":  {
+                                                     "name":  "meta",
+                                                     "required":  false,
+                                                     "in":  "query",
+                                                     "type":  "string"
+                                                 },
+                       "rowFilter.groups.created_at":  {
+                                                           "name":  "created_at",
+                                                           "required":  false,
+                                                           "in":  "query",
+                                                           "type":  "string"
+                                                       },
+                       "rowFilter.groups.updated_at":  {
+                                                           "name":  "updated_at",
+                                                           "required":  false,
+                                                           "in":  "query",
+                                                           "type":  "string"
+                                                       },
+                       "body.academic_years":  {
+                                                   "name":  "academic_years",
+                                                   "description":  "academic_years",
+                                                   "required":  false,
+                                                   "in":  "body",
+                                                   "schema":  {
+                                                                  "$ref":  "#/definitions/academic_years"
+                                                              }
+                                               },
+                       "rowFilter.academic_years.id":  {
+                                                           "name":  "id",
+                                                           "required":  false,
+                                                           "in":  "query",
+                                                           "type":  "string"
+                                                       },
+                       "rowFilter.academic_years.org_id":  {
+                                                               "name":  "org_id",
+                                                               "required":  false,
+                                                               "in":  "query",
+                                                               "type":  "string"
+                                                           },
+                       "rowFilter.academic_years.year":  {
+                                                             "name":  "year",
+                                                             "required":  false,
+                                                             "in":  "query",
+                                                             "type":  "string"
+                                                         },
+                       "rowFilter.academic_years.is_active":  {
+                                                                  "name":  "is_active",
+                                                                  "required":  false,
+                                                                  "in":  "query",
+                                                                  "type":  "string"
+                                                              },
+                       "rowFilter.academic_years.created_at":  {
+                                                                   "name":  "created_at",
+                                                                   "required":  false,
+                                                                   "in":  "query",
+                                                                   "type":  "string"
+                                                               },
+                       "body.attendance_records":  {
+                                                       "name":  "attendance_records",
+                                                       "description":  "attendance_records",
+                                                       "required":  false,
+                                                       "in":  "body",
+                                                       "schema":  {
+                                                                      "$ref":  "#/definitions/attendance_records"
+                                                                  }
+                                                   },
+                       "rowFilter.attendance_records.id":  {
+                                                               "name":  "id",
+                                                               "required":  false,
+                                                               "in":  "query",
+                                                               "type":  "string"
+                                                           },
+                       "rowFilter.attendance_records.org_id":  {
+                                                                   "name":  "org_id",
+                                                                   "required":  false,
+                                                                   "in":  "query",
+                                                                   "type":  "string"
+                                                               },
+                       "rowFilter.attendance_records.session_id":  {
+                                                                       "name":  "session_id",
+                                                                       "required":  false,
+                                                                       "in":  "query",
+                                                                       "type":  "string"
+                                                                   },
+                       "rowFilter.attendance_records.student_id":  {
+                                                                       "name":  "student_id",
+                                                                       "required":  false,
+                                                                       "in":  "query",
+                                                                       "type":  "string"
+                                                                   },
+                       "rowFilter.attendance_records.status":  {
+                                                                   "name":  "status",
+                                                                   "required":  false,
+                                                                   "in":  "query",
+                                                                   "type":  "string"
+                                                               },
+                       "rowFilter.attendance_records.justification":  {
+                                                                          "name":  "justification",
+                                                                          "required":  false,
+                                                                          "in":  "query",
+                                                                          "type":  "string"
+                                                                      },
+                       "rowFilter.attendance_records.comment":  {
+                                                                    "name":  "comment",
+                                                                    "required":  false,
+                                                                    "in":  "query",
+                                                                    "type":  "string"
+                                                                },
+                       "rowFilter.attendance_records.updated_by":  {
+                                                                       "name":  "updated_by",
+                                                                       "required":  false,
+                                                                       "in":  "query",
+                                                                       "type":  "string"
+                                                                   },
+                       "rowFilter.attendance_records.created_at":  {
+                                                                       "name":  "created_at",
+                                                                       "required":  false,
+                                                                       "in":  "query",
+                                                                       "type":  "string"
+                                                                   },
+                       "rowFilter.attendance_records.updated_at":  {
+                                                                       "name":  "updated_at",
+                                                                       "required":  false,
+                                                                       "in":  "query",
+                                                                       "type":  "string"
+                                                                   },
+                       "body.students":  {
+                                             "name":  "students",
+                                             "description":  "students",
+                                             "required":  false,
+                                             "in":  "body",
+                                             "schema":  {
+                                                            "$ref":  "#/definitions/students"
+                                                        }
+                                         },
+                       "rowFilter.students.id":  {
+                                                     "name":  "id",
+                                                     "required":  false,
+                                                     "in":  "query",
+                                                     "type":  "string"
+                                                 },
+                       "rowFilter.students.org_id":  {
+                                                         "name":  "org_id",
+                                                         "required":  false,
+                                                         "in":  "query",
+                                                         "type":  "string"
+                                                     },
+                       "rowFilter.students.first_name":  {
+                                                             "name":  "first_name",
+                                                             "required":  false,
+                                                             "in":  "query",
+                                                             "type":  "string"
+                                                         },
+                       "rowFilter.students.last_name":  {
+                                                            "name":  "last_name",
+                                                            "required":  false,
+                                                            "in":  "query",
+                                                            "type":  "string"
+                                                        },
+                       "rowFilter.students.dni":  {
+                                                      "name":  "dni",
+                                                      "required":  false,
+                                                      "in":  "query",
+                                                      "type":  "string"
+                                                  },
+                       "rowFilter.students.doc_id":  {
+                                                         "name":  "doc_id",
+                                                         "required":  false,
+                                                         "in":  "query",
+                                                         "type":  "string"
+                                                     },
+                       "rowFilter.students.notes":  {
+                                                        "name":  "notes",
+                                                        "required":  false,
+                                                        "in":  "query",
+                                                        "type":  "string"
+                                                    },
+                       "rowFilter.students.is_active":  {
+                                                            "name":  "is_active",
+                                                            "required":  false,
+                                                            "in":  "query",
+                                                            "type":  "string"
+                                                        },
+                       "rowFilter.students.created_at":  {
+                                                             "name":  "created_at",
+                                                             "required":  false,
+                                                             "in":  "query",
+                                                             "type":  "string"
+                                                         },
+                       "rowFilter.students.updated_at":  {
+                                                             "name":  "updated_at",
+                                                             "required":  false,
+                                                             "in":  "query",
+                                                             "type":  "string"
+                                                         },
+                       "body.group_students":  {
+                                                   "name":  "group_students",
+                                                   "description":  "group_students",
+                                                   "required":  false,
+                                                   "in":  "body",
+                                                   "schema":  {
+                                                                  "$ref":  "#/definitions/group_students"
+                                                              }
+                                               },
+                       "rowFilter.group_students.id":  {
+                                                           "name":  "id",
+                                                           "required":  false,
+                                                           "in":  "query",
+                                                           "type":  "string"
+                                                       },
+                       "rowFilter.group_students.group_id":  {
+                                                                 "name":  "group_id",
+                                                                 "required":  false,
+                                                                 "in":  "query",
+                                                                 "type":  "string"
+                                                             },
+                       "rowFilter.group_students.student_id":  {
+                                                                   "name":  "student_id",
+                                                                   "required":  false,
+                                                                   "in":  "query",
+                                                                   "type":  "string"
+                                                               },
+                       "rowFilter.group_students.is_active":  {
+                                                                  "name":  "is_active",
+                                                                  "required":  false,
+                                                                  "in":  "query",
+                                                                  "type":  "string"
+                                                              },
+                       "rowFilter.group_students.created_at":  {
+                                                                   "name":  "created_at",
+                                                                   "required":  false,
+                                                                   "in":  "query",
+                                                                   "type":  "string"
+                                                               },
+                       "body.organization_members":  {
+                                                         "name":  "organization_members",
+                                                         "description":  "organization_members",
+                                                         "required":  false,
+                                                         "in":  "body",
+                                                         "schema":  {
+                                                                        "$ref":  "#/definitions/organization_members"
+                                                                    }
+                                                     },
+                       "rowFilter.organization_members.id":  {
+                                                                 "name":  "id",
+                                                                 "required":  false,
+                                                                 "in":  "query",
+                                                                 "type":  "string"
+                                                             },
+                       "rowFilter.organization_members.org_id":  {
+                                                                     "name":  "org_id",
+                                                                     "required":  false,
+                                                                     "in":  "query",
+                                                                     "type":  "string"
+                                                                 },
+                       "rowFilter.organization_members.user_id":  {
+                                                                      "name":  "user_id",
+                                                                      "required":  false,
+                                                                      "in":  "query",
+                                                                      "type":  "string"
+                                                                  },
+                       "rowFilter.organization_members.role":  {
+                                                                   "name":  "role",
+                                                                   "required":  false,
+                                                                   "in":  "query",
+                                                                   "type":  "string"
+                                                               },
+                       "rowFilter.organization_members.created_at":  {
+                                                                         "name":  "created_at",
+                                                                         "required":  false,
+                                                                         "in":  "query",
+                                                                         "type":  "string"
+                                                                     }
+                   },
+    "externalDocs":  {
+                         "description":  "PostgREST Documentation",
+                         "url":  "https://postgrest.org/en/v14/references/api.html"
+                     }
+}

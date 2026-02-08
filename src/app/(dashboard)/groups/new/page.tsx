@@ -50,49 +50,92 @@ export default function NewGroupPage() {
 
         try {
             // 1. Create Group
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('Usuario no autenticado');
+
             const { data: group, error: groupError } = await supabase
                 .from('groups')
                 .insert({
                     org_id: academicYear.org_id,
                     academic_year_id: academicYear.id,
                     name,
-                    type
+                    type,
+                    teacher_id: user.id // Attribute to current user
                 })
                 .select()
                 .single();
 
             if (groupError) throw groupError;
 
-            // 2. Parse and Create Students
+            // 2. Parse Students and Find/Create them
             const studentLines = studentsText.split('\n').filter(line => line.trim());
-            const studentsToInsert = studentLines.map(line => {
-                const parts = line.split(',').map(p => p.trim());
-                return {
-                    org_id: academicYear.org_id,
-                    first_name: parts[0] || 'Alumno',
-                    last_name: parts[1] || '.',
-                    doc_id: parts[2] || null
-                };
+
+            // Fetch ALL existing students in the organization to avoid multiple queries
+            const { data: existingOrgStudents } = await supabase
+                .from('students')
+                .select('*')
+                .eq('org_id', academicYear.org_id);
+
+            const existingMapped = new Map();
+            existingOrgStudents?.forEach(s => {
+                // Key by DNI or by Normalized Name
+                if (s.doc_id) existingMapped.set(s.doc_id, s.id);
+                existingMapped.set(`${s.first_name.toLowerCase().trim()}|${s.last_name.toLowerCase().trim()}`, s.id);
             });
 
-            const { data: createdStudents, error: studError } = await supabase
-                .from('students')
-                .insert(studentsToInsert)
-                .select();
+            const studentsToCreate: any[] = [];
+            const studentIdsToLink: string[] = [];
 
-            if (studError) throw studError;
+            studentLines.forEach(line => {
+                const parts = line.split(',').map(p => p.trim());
+                const first = parts[0] || 'Alumno';
+                const last = parts[1] || '.';
+                const docValue = parts[2] || null;
 
-            // 3. Link students to group
-            const groupStudents = createdStudents.map(s => ({
+                const nameKey = `${first.toLowerCase().trim()}|${last.toLowerCase().trim()}`;
+
+                let existingId = docValue ? existingMapped.get(docValue) : null;
+                if (!existingId) existingId = existingMapped.get(nameKey);
+
+                if (existingId) {
+                    studentIdsToLink.push(existingId);
+                } else {
+                    studentsToCreate.push({
+                        org_id: academicYear.org_id,
+                        first_name: first,
+                        last_name: last,
+                        doc_id: docValue,
+                        dni: docValue
+                    });
+                }
+            });
+
+            // Insert new students
+            if (studentsToCreate.length > 0) {
+                const { data: newlyCreated, error: studError } = await supabase
+                    .from('students')
+                    .insert(studentsToCreate)
+                    .select();
+
+                if (studError) throw studError;
+                if (newlyCreated) {
+                    newlyCreated.forEach(s => studentIdsToLink.push(s.id));
+                }
+            }
+
+            // 3. Link students to group (deduplicated)
+            const uniqueIds = Array.from(new Set(studentIdsToLink));
+            const groupStudents = uniqueIds.map(sid => ({
                 group_id: group.id,
-                student_id: s.id
+                student_id: sid
             }));
 
-            const { error: linkError } = await supabase
-                .from('group_students')
-                .insert(groupStudents);
-
-            if (linkError) throw linkError;
+            if (groupStudents.length > 0) {
+                const { error: linkError } = await supabase
+                    .from('group_students')
+                    .insert(groupStudents);
+                if (linkError) throw linkError;
+            }
 
             router.push('/');
             router.refresh();

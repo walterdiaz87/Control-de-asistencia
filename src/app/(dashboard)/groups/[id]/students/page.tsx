@@ -49,24 +49,62 @@ export default function GroupStudentsPage({ params }: { params: Promise<{ id: st
         try {
             if (!group) return;
 
-            const studentsToInsert = imported.map(s => ({
-                org_id: group.org_id,
-                first_name: s.first_name,
-                last_name: s.last_name,
-                doc_id: s.doc_id || null
-            }));
-
-            const { data: createdStudents, error: studError } = await supabase
+            // 1. Fetch existing students in org
+            const { data: existingOrgStudents } = await supabase
                 .from('students')
-                .upsert(studentsToInsert, { onConflict: 'org_id, doc_id', ignoreDuplicates: false })
-                .select();
+                .select('*')
+                .eq('org_id', group.org_id);
 
-            if (studError) throw studError;
+            const existingMapped = new Map();
+            existingOrgStudents?.forEach(s => {
+                if (s.doc_id) existingMapped.set(s.doc_id, s.id);
+                existingMapped.set(`${s.first_name.toLowerCase().trim()}|${s.last_name.toLowerCase().trim()}`, s.id);
+            });
 
-            if (createdStudents) {
-                const links = createdStudents.map(s => ({
+            const studentsToCreate: any[] = [];
+            const studentIdsToLink: string[] = [];
+
+            imported.forEach(s => {
+                const first = s.first_name;
+                const last = s.last_name;
+                const docValue = s.doc_id || null;
+                const nameKey = `${first.toLowerCase().trim()}|${last.toLowerCase().trim()}`;
+
+                let existingId = docValue ? existingMapped.get(docValue) : null;
+                if (!existingId) existingId = existingMapped.get(nameKey);
+
+                if (existingId) {
+                    studentIdsToLink.push(existingId);
+                } else {
+                    studentsToCreate.push({
+                        org_id: group.org_id,
+                        first_name: first,
+                        last_name: last,
+                        doc_id: docValue,
+                        dni: docValue
+                    });
+                }
+            });
+
+            // 2. Create new students
+            if (studentsToCreate.length > 0) {
+                const { data: newlyCreated, error: studError } = await supabase
+                    .from('students')
+                    .insert(studentsToCreate)
+                    .select();
+
+                if (studError) throw studError;
+                if (newlyCreated) {
+                    newlyCreated.forEach(s => studentIdsToLink.push(s.id));
+                }
+            }
+
+            // 3. Link students (deduplicated)
+            if (studentIdsToLink.length > 0) {
+                const uniqueIds = Array.from(new Set(studentIdsToLink));
+                const links = uniqueIds.map(sid => ({
                     group_id: id,
-                    student_id: s.id
+                    student_id: sid
                 }));
 
                 const { error: linkError } = await supabase
@@ -90,7 +128,11 @@ export default function GroupStudentsPage({ params }: { params: Promise<{ id: st
         // Actually, the form saves to 'students' table. We need to ensure it's in 'group_students'.
         const { error: linkError } = await supabase
             .from('group_students')
-            .upsert({ group_id: id, student_id: student.id }, { onConflict: 'group_id, student_id', ignoreDuplicates: true });
+            .upsert({
+                group_id: id,
+                student_id: student.id,
+                org_id: group.org_id
+            }, { onConflict: 'group_id, student_id', ignoreDuplicates: true });
 
         if (linkError) {
             alert('Error al vincular alumno al grupo: ' + linkError.message);

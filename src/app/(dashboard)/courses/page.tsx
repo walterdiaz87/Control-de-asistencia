@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/hooks/use-queries';
 import { createClient } from '@/lib/supabase/client';
-import { Plus, BookOpen, Users, MoreVertical, Edit2, Trash2, ArrowRight } from 'lucide-react';
+import { Plus, BookOpen, Users, MoreVertical, Edit2, Trash2, ArrowRight, FileBarChart } from 'lucide-react';
 import CourseForm from '@/components/CourseForm';
 import { useRouter } from 'next/navigation';
 
@@ -16,37 +18,52 @@ export default function CoursesPage() {
 
     const supabase = createClient();
     const router = useRouter();
+    const queryClient = useQueryClient();
 
     const fetchGroups = async () => {
         setLoading(true);
-        // Get user session to know generic info if needed, but primarily we need org_id
-        // Ideally we assume user has one organization active or we get it from their membership
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            router.push('/login');
-            return;
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                router.push('/login');
+                return;
+            }
+            setCurrentUserId(session.user.id);
+
+            // Fetch membership with role
+            const { data: membership, error: memError } = await supabase
+                .from('organization_members')
+                .select('org_id, role')
+                .eq('user_id', session.user.id)
+                .limit(1)
+                .maybeSingle();
+
+            if (memError) throw memError;
+
+            if (membership) {
+                setOrgId(membership.org_id);
+
+                let query = supabase
+                    .from('groups')
+                    .select('*, academic_years(year)')
+                    .eq('org_id', membership.org_id);
+
+                // Role-based filtering (Same as Dashboard)
+                if (membership.role !== 'admin') {
+                    query = query.eq('teacher_id', session.user.id);
+                }
+
+                const { data, error: groupError } = await query.order('created_at', { ascending: false });
+                if (groupError) throw groupError;
+
+                setGroups(data || []);
+            }
+        } catch (err: any) {
+            console.error('[FetchGroups Error]', err);
+            // alert('Error al cargar grupos: ' + err.message);
+        } finally {
+            setLoading(false);
         }
-        setCurrentUserId(session.user.id);
-
-        const { data: membership } = await supabase
-            .from('organization_members')
-            .select('org_id')
-            .eq('user_id', session.user.id)
-            .single();
-
-        if (membership) {
-            setOrgId(membership.org_id);
-            const { data } = await supabase
-                .from('groups')
-                .select('*, academic_years(year)')
-                .eq('org_id', membership.org_id)
-                .order('created_at', { ascending: false });
-
-            // Fetch student counts - simple approach for now, or use a view/rpc
-            // Doing a separate query or using .select('*, students(count)') would be better but simple works
-            setGroups(data || []);
-        }
-        setLoading(false);
     };
 
     useEffect(() => {
@@ -56,7 +73,10 @@ export default function CoursesPage() {
     const handleDelete = async (id: string) => {
         if (!confirm('¿Estás seguro de eliminar este curso? Se perderá el historial.')) return;
         const { error } = await supabase.from('groups').delete().eq('id', id);
-        if (!error) fetchGroups();
+        if (!error) {
+            queryClient.invalidateQueries({ queryKey: ['groups'] });
+            fetchGroups();
+        }
         else alert('Error: ' + error.message);
     };
 
@@ -101,13 +121,15 @@ export default function CoursesPage() {
                                 <p className="text-xs font-bold text-slate-400 mb-6">Año {group.academic_years?.year}</p>
 
                                 <div className="mt-auto flex items-center gap-2 pt-6 border-t border-slate-50">
-                                    <a href={`/groups/${group.id}/students`} className="flex-1 py-2 text-center text-xs font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                        <Users className="w-4 h-4" />
-                                        Alumnos
+                                    <a href={`/groups/${group.id}/students`} className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all" title="Alumnos">
+                                        <Users className="w-5 h-5" />
                                     </a>
-                                    <a href={`/attendance/${group.id}`} className="flex-1 py-2 text-center text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20">
-                                        Asistencia
-                                        <ArrowRight className="w-3 h-3" />
+                                    <a href={`/history/${group.id}`} className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all" title="Historial y Reportes">
+                                        <FileBarChart className="w-5 h-5" />
+                                    </a>
+                                    <a href={`/attendance/${group.id}`} className="flex-1 py-3 text-center text-xs font-black text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20">
+                                        Captura
+                                        <ArrowRight className="w-3.5 h-3.5" />
                                     </a>
                                 </div>
                             </div>

@@ -40,15 +40,37 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
     const resolvedParams = use(params);
     const [currentId, setCurrentId] = useState(resolvedParams.id);
     const [activeTab, setActiveTab] = useState<'dashboard' | 'reports'>('reports');
-    const [selectedDateStr, setSelectedDateStr] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDateStr, setSelectedDateStr] = useState(format(new Date(), 'yyyy-MM-dd'));
     const [statusFilter, setStatusFilter] = useState<'all' | 'present' | 'absent' | 'justified' | 'unjustified'>('all');
+    const [membership, setMembership] = useState<{ org_id: string; role: string } | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
 
     const supabase = createClient();
     const router = useRouter();
 
+    useEffect(() => {
+        async function getContext() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                setUserId(session.user.id);
+                const { data } = await supabase
+                    .from('organization_members')
+                    .select('org_id, role')
+                    .eq('user_id', session.user.id)
+                    .limit(1)
+                    .maybeSingle();
+                if (data) setMembership(data);
+            }
+        }
+        getContext();
+    }, []);
+
     // --- Optimized Data Fetching ---
     // 1. All groups for dropdown (cached 5m)
-    const { data: allGroups = [] } = useGroups();
+    const { data: allGroups = [] } = useGroups(
+        membership?.org_id,
+        membership?.role !== 'admin' ? userId || undefined : undefined
+    );
 
     // 2. Group info and students (cached)
     const { data: groupData, isLoading: loadingGroup } = useGroupWithStudents(currentId);
@@ -94,7 +116,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
 
     const chartData = useMemo(() => {
         return sessions.slice(0, 7).reverse().map(s => ({
-            date: format(parseISO(s.date), 'd MMM', { locale: es }),
+            date: format(new Date(s.date + 'T12:00:00'), 'd MMM', { locale: es }),
             presentes: s.attendance_records.filter((r: any) => r.status === 'present').length,
             ausentes: s.attendance_records.filter((r: any) => r.status === 'absent').length
         }));
@@ -317,7 +339,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                             <div className="w-full bg-slate-50 h-full pl-12 pr-4 flex items-center transition-all group-hover:bg-slate-100 ring-1 ring-transparent group-hover:ring-indigo-100/50">
                                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
                                                 <span className="text-sm font-black text-slate-900 truncate uppercase">
-                                                    {format(parseISO(selectedDateStr), "EEEE d 'de' MMMM", { locale: es })}
+                                                    {format(new Date(selectedDateStr + 'T12:00:00'), "EEEE d 'de' MMMM", { locale: es })}
                                                 </span>
                                             </div>
                                             <input
@@ -390,7 +412,9 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                         <div className="flex justify-between items-center text-sm">
                                             <span className="text-slate-400 font-bold">Asistencia</span>
                                             <span className="font-black text-indigo-600 px-2 py-1 bg-indigo-50 rounded-lg">
-                                                {Math.round((activeStats.present / activeStats.total) * 100)}%
+                                                {activeStats.total > 0
+                                                    ? Math.round((activeStats.present / activeStats.total) * 100)
+                                                    : 0}%
                                             </span>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
@@ -437,7 +461,7 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
                                         <p className="text-sm text-slate-400">No se ha tomado asistencia para este día.</p>
                                     </div>
                                     <button
-                                        onClick={() => router.push(`/attendance/${currentId}`)}
+                                        onClick={() => router.push('/courses')}
                                         className="brand-button-primary px-8 h-12 text-sm mt-4"
                                     >
                                         Tomar Asistencia Hoy

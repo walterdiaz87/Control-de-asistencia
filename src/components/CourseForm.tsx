@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { X, Save, Loader2 } from 'lucide-react';
@@ -24,6 +25,7 @@ export default function CourseForm({ onClose, onSuccess, initialData, orgId }: C
 
     const [loading, setLoading] = useState(false);
     const supabase = createClient();
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         const fetchYears = async () => {
@@ -45,11 +47,19 @@ export default function CourseForm({ onClose, onSuccess, initialData, orgId }: C
         e.preventDefault();
         setLoading(true);
 
-        const payload = {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            alert('Sesión expirada');
+            setLoading(false);
+            return;
+        }
+
+        const payload: any = {
             org_id: orgId,
             name,
             type,
-            academic_year_id: selectedYearId
+            academic_year_id: selectedYearId,
+            teacher_id: user.id // Always attribute to creator
         };
 
         let error;
@@ -67,10 +77,7 @@ export default function CourseForm({ onClose, onSuccess, initialData, orgId }: C
                 .single();
             error = err;
             if (data) {
-                // Should we redirect to add students? User request says: "Al crear, redirigir a 'Alumnos del curso' para cargar alumnos."
-                onSuccess(); // We will handle redirect in parent or here
-                // But wait, the prop onSuccess implies just closing/refreshing.
-                // Let's modify logic.
+                onSuccess();
             }
         }
 
@@ -79,6 +86,7 @@ export default function CourseForm({ onClose, onSuccess, initialData, orgId }: C
         if (error) {
             alert('Error al guardar: ' + error.message);
         } else {
+            queryClient.invalidateQueries({ queryKey: ['groups'] });
             onSuccess();
         }
     };

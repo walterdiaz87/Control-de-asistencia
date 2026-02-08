@@ -52,20 +52,47 @@ export default function StudentDashboard({ params }: { params: Promise<{ id: str
 
                 setHistory(sorted);
 
-                // 3. Compute Stats
+                // Group by Group ID for per-group stats
+                const grouped: any = {};
+                sorted.forEach((r: any) => {
+                    const gId = r.sessions?.groups?.id || 'unknown';
+                    const gName = r.sessions?.groups?.name || 'Otro';
+                    if (!grouped[gId]) {
+                        grouped[gId] = { id: gId, name: gName, records: [], stats: {} };
+                    }
+                    grouped[gId].records.push(r);
+                });
+
+                Object.keys(grouped).forEach(gId => {
+                    const groupRecords = grouped[gId].records;
+                    const total = groupRecords.length;
+                    const present = groupRecords.filter((r: any) => r.status === 'present').length;
+                    const late = groupRecords.filter((r: any) => r.status === 'late').length;
+                    grouped[gId].stats = {
+                        total,
+                        present,
+                        absent: groupRecords.filter((r: any) => r.status === 'absent').length,
+                        late,
+                        justified: groupRecords.filter((r: any) => r.status === 'justified').length,
+                        percentage: total > 0 ? Math.round(((present + late * 0.5) / total) * 100) : 0
+                    };
+                });
+
+                // Global Stats
                 const total = sorted.length;
                 const present = sorted.filter((r: any) => r.status === 'present').length;
-                const absent = sorted.filter((r: any) => r.status === 'absent').length;
                 const late = sorted.filter((r: any) => r.status === 'late').length;
-                const justified = sorted.filter((r: any) => r.status === 'justified').length;
 
                 setStats({
-                    total,
-                    present,
-                    absent,
-                    late,
-                    justified,
-                    percentage: total > 0 ? Math.round(((present + late * 0.5) / total) * 100) : 0
+                    global: {
+                        total,
+                        present,
+                        absent: sorted.filter((r: any) => r.status === 'absent').length,
+                        late,
+                        justified: sorted.filter((r: any) => r.status === 'justified').length,
+                        percentage: total > 0 ? Math.round(((present + late * 0.5) / total) * 100) : 0
+                    },
+                    perGroup: Object.values(grouped)
                 });
             }
 
@@ -109,8 +136,9 @@ export default function StudentDashboard({ params }: { params: Promise<{ id: str
             <main className="max-w-5xl mx-auto space-y-8">
                 {/* Stats Overview */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Main Score */}
-                    <div className="brand-card p-8 flex flex-col items-center justify-center text-center bg-white">
+                    {/* Main Score (Global) */}
+                    <div className="brand-card p-8 flex flex-col items-center justify-center text-center bg-white relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-3 bg-slate-50 text-slate-400 font-black text-[8px] uppercase tracking-tighter border-bl rounded-bl-xl">Global</div>
                         <div className="relative w-40 h-40 mb-4">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -128,49 +156,40 @@ export default function StudentDashboard({ params }: { params: Promise<{ id: str
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="absolute inset-0 flex items-center justify-center flex-col">
-                                <span className="text-4xl font-black text-slate-900">{stats?.percentage}%</span>
+                                <span className="text-4xl font-black text-slate-900">{stats?.global?.percentage}%</span>
                                 <span className="text-[10px] uppercase font-bold text-slate-400">Asistencia</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Breakdown */}
-                    <div className="md:col-span-2 grid grid-cols-2 gap-4">
-                        <div className="brand-card p-6 bg-emerald-50 border-emerald-100 flex flex-col justify-between">
-                            <div className="p-3 bg-white w-fit rounded-xl text-emerald-600 mb-2">
-                                <CheckCircle2 className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <span className="text-3xl font-black text-emerald-800">{stats?.present}</span>
-                                <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Presentes</p>
-                            </div>
+                    {/* Breakdown by Group */}
+                    <div className="md:col-span-2 brand-card p-8 bg-white overflow-hidden">
+                        <div className="flex items-center gap-2 mb-6 text-slate-900">
+                            <TrendingUp className="w-5 h-5 text-indigo-500" />
+                            <h3 className="text-lg font-black tracking-tight">Promedio por Curso / Taller</h3>
                         </div>
-                        <div className="brand-card p-6 bg-red-50 border-red-100 flex flex-col justify-between">
-                            <div className="p-3 bg-white w-fit rounded-xl text-red-600 mb-2">
-                                <XCircle className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <span className="text-3xl font-black text-red-800">{stats?.absent}</span>
-                                <p className="text-xs font-bold text-red-600 uppercase tracking-wider">Ausencias</p>
-                            </div>
-                        </div>
-                        <div className="brand-card p-6 bg-amber-50 border-amber-100 flex flex-col justify-between">
-                            <div className="p-3 bg-white w-fit rounded-xl text-amber-600 mb-2">
-                                <Clock className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <span className="text-3xl font-black text-amber-800">{stats?.late}</span>
-                                <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">Llegadas Tarde</p>
-                            </div>
-                        </div>
-                        <div className="brand-card p-6 bg-blue-50 border-blue-100 flex flex-col justify-between">
-                            <div className="p-3 bg-white w-fit rounded-xl text-blue-600 mb-2">
-                                <AlertCircle className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <span className="text-3xl font-black text-blue-800">{stats?.justified}</span>
-                                <p className="text-xs font-bold text-blue-600 uppercase tracking-wider">Justificadas</p>
-                            </div>
+                        <div className="space-y-4 max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
+                            {stats?.perGroup?.map((group: any) => (
+                                <div key={group.id} className="group flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100/50 hover:border-indigo-100 transition-all">
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Grupo</span>
+                                        <span className="font-bold text-slate-900 truncate max-w-[200px]">{group.name}</span>
+                                    </div>
+                                    <div className="text-right flex items-center gap-4">
+                                        <div className="hidden sm:block">
+                                            <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                                <div
+                                                    className={`h-full rounded-full transition-all duration-1000 ${group.stats.percentage > 80 ? 'bg-emerald-500' : group.stats.percentage > 60 ? 'bg-amber-500' : 'bg-red-500'}`}
+                                                    style={{ width: `${group.stats.percentage}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <span className={`text-2xl font-black tracking-tighter ${group.stats.percentage > 80 ? 'text-emerald-600' : group.stats.percentage > 60 ? 'text-amber-600' : 'text-red-600'}`}>
+                                            {group.stats.percentage}%
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -186,16 +205,16 @@ export default function StudentDashboard({ params }: { params: Promise<{ id: str
                             <div key={record.id} className="flex items-center justify-between p-4 border rounded-2xl hover:bg-slate-50 transition-colors">
                                 <div>
                                     <p className="font-bold text-slate-900 text-lg capitalize">
-                                        {format(new Date(record.sessions.date), "EEEE d 'de' MMMM", { locale: es })}
+                                        {format(new Date(record.sessions.date + 'T12:00:00'), "EEEE d 'de' MMMM", { locale: es })}
                                     </p>
                                     <p className="text-xs text-slate-400 font-medium">
                                         {record.sessions.groups.name}
                                     </p>
                                 </div>
                                 <div className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider border ${record.status === 'present' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                        record.status === 'absent' ? 'bg-red-50 text-red-600 border-red-100' :
-                                            record.status === 'late' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                                                'bg-blue-50 text-blue-600 border-blue-100'
+                                    record.status === 'absent' ? 'bg-red-50 text-red-600 border-red-100' :
+                                        record.status === 'late' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                            'bg-blue-50 text-blue-600 border-blue-100'
                                     }`}>
                                     {record.status === 'present' ? 'Presente' :
                                         record.status === 'absent' ? 'Ausente' :

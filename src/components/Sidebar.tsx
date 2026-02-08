@@ -9,8 +9,8 @@ import { useRouter } from 'next/navigation';
 const navItems = [
     { href: '/', label: 'Dashboard', icon: LayoutGrid },
     { href: '/courses', label: 'Cursos', icon: BookOpen },
-    { href: '/students', label: 'Alumnos', icon: Users }, // Global student list if needed, or stick to course-based
-    // { href: '/attendance', label: 'Asistencia', icon: ClipboardCheck }, // Often context-dependent
+    { href: '/students', label: 'Alumnos', icon: Users },
+    { href: '/history', label: 'Historial', icon: FileBarChart },
 ];
 
 export function Sidebar() {

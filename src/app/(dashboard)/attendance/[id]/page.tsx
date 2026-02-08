@@ -14,6 +14,7 @@ import {
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useGroupWithStudents, useTodaySession } from '@/hooks/use-queries';
+import { Skeleton, AttendanceSkeleton } from '@/components/Skeleton';
 
 interface Student {
     id: string;
@@ -43,7 +44,7 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
     const supabase = createClient();
     const router = useRouter();
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0];
+    const dateStr = format(today, 'yyyy-MM-dd');
 
     // --- Optimized Data Fetching ---
     const { data: groupData, isLoading: loadingGroup, error: groupError } = useGroupWithStudents(groupId);
@@ -174,17 +175,26 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
         }
     };
 
+
     const stats = {
         present: Object.values(attendance).filter(r => r.status === 'present').length,
         absent: Object.values(attendance).filter(r => r.status === 'absent').length
     };
 
     if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50">
-            <div className="flex flex-col items-center gap-4">
-                <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
-                <p className="text-slate-400 font-black tracking-widest text-[10px] uppercase">Cargando Alumnos...</p>
-            </div>
+        <div className="min-h-screen bg-slate-50 pb-32">
+            <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100 px-6 py-4">
+                <div className="flex items-center gap-4">
+                    <Skeleton className="w-10 h-10 rounded-xl" />
+                    <div className="space-y-2">
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-3 w-20" />
+                    </div>
+                </div>
+            </header>
+            <main className="p-4 md:max-w-3xl md:mx-auto">
+                <AttendanceSkeleton />
+            </main>
         </div>
     );
 
@@ -351,6 +361,27 @@ const StudentRow = memo(({ student, record, updateStatus, updateJustification, u
                     </div>
                 </div>
 
+                {/* Comment field - always visible */}
+                <div className={`pt-4 border-t space-y-1.5 animate-in slide-in-from-top-2 duration-300 ${record.status === 'absent' ? 'border-red-100' : 'border-slate-100'
+                    }`}>
+                    <div className="flex items-center gap-2 ml-1">
+                        <MessageSquare className={`w-3 h-3 ${record.status === 'absent' ? 'text-red-300' : 'text-slate-400'}`} />
+                        <label className={`text-[9px] font-black uppercase tracking-widest ${record.status === 'absent' ? 'text-red-400' : 'text-slate-400'
+                            }`}>Comentario</label>
+                    </div>
+                    <input
+                        type="text"
+                        placeholder={record.status === 'absent' ? 'Ej. Avisó por cuaderno' : 'Ej. Llegó tarde, participó activamente'}
+                        value={record.comment || ''}
+                        onChange={(e) => updateComment(student.id, e.target.value)}
+                        className={`w-full border p-3 rounded-xl text-xs font-bold placeholder:font-normal focus:ring-2 outline-none transition-all ${record.status === 'absent'
+                                ? 'bg-white/50 border-red-100 text-red-900 placeholder:text-red-200 focus:ring-red-200'
+                                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:ring-indigo-200 focus:border-indigo-300'
+                            }`}
+                    />
+                </div>
+
+                {/* Justification section - only for absent students */}
                 {record.status === 'absent' && (
                     <div className="pt-4 border-t border-red-100 space-y-4 animate-in slide-in-from-top-2 duration-300">
                         <div className="flex flex-col gap-2">
@@ -375,20 +406,6 @@ const StudentRow = memo(({ student, record, updateStatus, updateJustification, u
                                     NO JUSTIFICADA
                                 </button>
                             </div>
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                            <div className="flex items-center gap-2 ml-1">
-                                <MessageSquare className="w-3 h-3 text-red-300" />
-                                <label className="text-[9px] font-black text-red-400 uppercase tracking-widest">Comentario</label>
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Ej. Avisó por cuaderno"
-                                value={record.comment || ''}
-                                onChange={(e) => updateComment(student.id, e.target.value)}
-                                className="bg-white/50 border border-red-100 p-3 rounded-xl text-xs font-bold text-red-900 placeholder:text-red-200 focus:ring-2 focus:ring-red-200 outline-none transition-all"
-                            />
                         </div>
                     </div>
                 )}
