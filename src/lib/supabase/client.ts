@@ -9,7 +9,7 @@ export const createClient = () => {
     }
 
     return createBrowserClient(
-        url || 'https://placeholder.supabase.co',
+        url || 'https://supabase.walterdiaz87.com',
         key || 'placeholder'
     );
 };
