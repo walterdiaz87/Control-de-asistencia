@@ -34,83 +34,47 @@ interface Session {
     attendance_records: any[];
 }
 
+import { useGroups, useGroupWithStudents, useGroupSessions, useDailySummary } from '@/hooks/use-queries';
+
 export default function HistoryPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const [currentId, setCurrentId] = useState(resolvedParams.id);
-    const [sessions, setSessions] = useState<Session[]>([]);
-    const [students, setStudents] = useState<Student[]>([]);
-    const [group, setGroup] = useState<any>(null);
-    const [allGroups, setAllGroups] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'dashboard' | 'reports'>('reports');
-
-    // Reports State
     const [selectedDateStr, setSelectedDateStr] = useState(new Date().toISOString().split('T')[0]);
     const [statusFilter, setStatusFilter] = useState<'all' | 'present' | 'absent' | 'justified' | 'unjustified'>('all');
 
     const supabase = createClient();
     const router = useRouter();
 
-    // Fetch all groups for the dropdown once
+    // --- Optimized Data Fetching ---
+    // 1. All groups for dropdown (cached 5m)
+    const { data: allGroups = [] } = useGroups();
+
+    // 2. Group info and students (cached)
+    const { data: groupData, isLoading: loadingGroup } = useGroupWithStudents(currentId);
+    const { group, students = [] } = groupData || {};
+
+    // 3. All sessions (for dashboard charts)
+    const { data: sessions = [], isLoading: loadingSessions } = useGroupSessions(currentId);
+
+    // 4. Daily Summary (optimized RPC for the side panel)
+    const { data: rpcStats, isLoading: loadingSummary } = useDailySummary(currentId, selectedDateStr);
+
+    // Sync URL when currentId changes (if navigated via dropdown)
     useEffect(() => {
-        async function fetchAllGroups() {
-            const { data } = await supabase.from('groups').select('*').order('name');
-            if (data) setAllGroups(data);
+        if (currentId !== resolvedParams.id) {
+            router.push(`/history/${currentId}`, { scroll: false });
         }
-        fetchAllGroups();
-    }, []);
+    }, [currentId, resolvedParams.id, router]);
 
+    // picking default date
     useEffect(() => {
-        async function fetchData() {
-            setLoading(true);
-            try {
-                // 1. Get Group
-                const { data: groupData } = await supabase.from('groups').select('*').eq('id', currentId).single();
-                if (groupData) setGroup(groupData);
-
-                // 2. Get Students for the group
-                const { data: studentData } = await supabase
-                    .from('group_students')
-                    .select('students(id, first_name, last_name, doc_id)')
-                    .eq('group_id', currentId);
-
-                if (studentData) {
-                    const list = studentData.map((s: any) => s.students)
-                        .filter(Boolean)
-                        .sort((a: any, b: any) => a.last_name.localeCompare(b.last_name));
-                    setStudents(list);
-                }
-
-                // 3. Get Sessions and Records
-                const { data: sessionData } = await supabase
-                    .from('sessions')
-                    .select(`*, attendance_records(*)`)
-                    .eq('group_id', currentId)
-                    .order('date', { ascending: false });
-
-                if (sessionData) {
-                    setSessions(sessionData);
-                    // Update URL if user switched course via dropdown
-                    if (currentId !== resolvedParams.id) {
-                        router.push(`/history/${currentId}`, { scroll: false });
-                    }
-
-                    // Set default selected date if not already set or manually changed
-                    if (sessionData.length > 0) {
-                        // We check if the current selectedDateStr has a session, if not we pick the latest
-                        if (!sessionData.some(s => s.date === selectedDateStr)) {
-                            setSelectedDateStr(sessionData[0].date);
-                        }
-                    }
-                }
-            } catch (err) {
-                console.error('Error fetching history:', err);
-            } finally {
-                setLoading(false);
-            }
+        if (sessions.length > 0 && !sessions.some(s => s.date === selectedDateStr)) {
+            setSelectedDateStr(sessions[0].date);
         }
-        fetchData();
-    }, [currentId]);
+    }, [sessions, selectedDateStr]);
+
+    const loading = loadingGroup || loadingSessions;
 
     // --- Analytics Logic ---
     const stats = useMemo(() => {
@@ -158,16 +122,15 @@ export default function HistoryPage({ params }: { params: Promise<{ id: string }
     }, [students, activeSession, statusFilter]);
 
     const activeStats = useMemo(() => {
-        if (!activeSession) return null;
-        const records = activeSession.attendance_records;
+        if (!rpcStats) return null;
         return {
-            total: students.length,
-            present: records.filter(r => r.status === 'present').length,
-            absent: records.filter(r => r.status === 'absent').length,
-            justified: records.filter(r => r.status === 'absent' && r.justification === 'justified').length,
-            unjustified: records.filter(r => r.status === 'absent' && r.justification === 'unjustified').length
+            total: Number(rpcStats.total_students),
+            present: Number(rpcStats.present_count),
+            absent: Number(rpcStats.absent_count),
+            justified: Number(rpcStats.justified_count),
+            unjustified: Number(rpcStats.unjustified_count)
         };
-    }, [activeSession, students]);
+    }, [rpcStats]);
 
     const exportDailyCSV = () => {
         const headers = ['Fecha', 'Curso', 'Apellido', 'Nombre', 'DNI', 'Estado', 'Justificación', 'Comentario'];

@@ -1,8 +1,4 @@
-'use client';
-
-export const dynamic = 'force-dynamic';
-
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, memo, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import {
@@ -13,6 +9,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useGroupWithStudents, useTodaySession } from '@/hooks/use-queries';
 
 interface Student {
     id: string;
@@ -34,12 +31,8 @@ interface AttendanceState {
 
 export default function AttendancePage({ params }: { params: Promise<{ id: string }> }) {
     const { id: groupId } = use(params);
-    const [students, setStudents] = useState<Student[]>([]);
-    const [group, setGroup] = useState<any>(null);
     const [attendance, setAttendance] = useState<AttendanceState>({});
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [session, setSession] = useState<any>(null);
     const [mode, setMode] = useState<'create' | 'edit'>('create');
     const [error, setError] = useState<string | null>(null);
 
@@ -48,87 +41,43 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
     const today = new Date();
     const dateStr = today.toISOString().split('T')[0];
 
+    // --- Optimized Data Fetching ---
+    const { data: groupData, isLoading: loadingGroup, error: groupError } = useGroupWithStudents(groupId);
+    const { group, students = [] } = groupData || {};
+
+    const { data: session, isLoading: loadingSession } = useTodaySession(groupId, dateStr);
+
+    // Initial load sync
     useEffect(() => {
-        async function fetchData() {
-            setLoading(true);
-            setError(null);
-
-            try {
-                // 1. Get Group Context
-                const { data: groupData, error: groupError } = await supabase
-                    .from('groups')
-                    .select('*')
-                    .eq('id', groupId)
-                    .single();
-
-                if (groupError) throw groupError;
-                setGroup(groupData);
-
-                // 2. Get Students (ordered by last name) - FIX: Use doc_id instead of dni
-                const { data: studentData, error: studentError } = await supabase
-                    .from('group_students')
-                    .select('students(id, first_name, last_name, doc_id)')
-                    .eq('group_id', groupId);
-
-                if (studentError) throw studentError;
-
-                const studentList: Student[] = (studentData || [])
-                    .map((s: any) => s.students)
-                    .filter(Boolean)
-                    .sort((a: any, b: any) => a.last_name.localeCompare(b.last_name));
-
-                setStudents(studentList);
-                console.log(`[Attendance] Group: ${groupId}, Students: ${studentList.length}`);
-
-                // 3. Check for existing session
-                const { data: existingSession, error: sessionError } = await supabase
-                    .from('sessions')
-                    .select('*, attendance_records(*)')
-                    .eq('group_id', groupId)
-                    .eq('date', dateStr)
-                    .maybeSingle();
-
-                if (sessionError) throw sessionError;
-
-                if (existingSession) {
-                    setSession(existingSession);
-                    setMode('edit');
-
-                    const initialState: AttendanceState = {};
-                    existingSession.attendance_records.forEach((r: any) => {
-                        initialState[r.student_id] = {
-                            status: r.status,
-                            justification: r.justification,
-                            comment: r.comment,
-                            record_id: r.id
-                        };
-                    });
-
-                    // Add default states for students not in the record (newly added students)
-                    studentList.forEach(s => {
-                        if (!initialState[s.id]) {
-                            initialState[s.id] = { status: 'present' };
-                        }
-                    });
-                    setAttendance(initialState);
-                } else {
-                    // Default to Present for everyone
-                    const initialState: AttendanceState = {};
-                    studentList.forEach(s => {
-                        initialState[s.id] = { status: 'present' };
-                    });
-                    setAttendance(initialState);
-                }
-
-            } catch (err: any) {
-                console.error('[Attendance Error]', err);
-                setError(err.message || 'Error al cargar los datos');
-            } finally {
-                setLoading(false);
+        if (!loadingGroup && !loadingSession && groupData) {
+            if (session) {
+                setMode('edit');
+                const initialState: AttendanceState = {};
+                session.attendance_records.forEach((r: any) => {
+                    initialState[r.student_id] = {
+                        status: r.status,
+                        justification: r.justification,
+                        comment: r.comment,
+                        record_id: r.id
+                    };
+                });
+                // Fill missing
+                students.forEach(s => {
+                    if (!initialState[s.id]) initialState[s.id] = { status: 'present' };
+                });
+                setAttendance(initialState);
+            } else {
+                setMode('create');
+                const initialState: AttendanceState = {};
+                students.forEach(s => {
+                    initialState[s.id] = { status: 'present' };
+                });
+                setAttendance(initialState);
             }
         }
-        fetchData();
-    }, [groupId, dateStr]);
+    }, [loadingGroup, loadingSession, groupData, session, students]);
+
+    const loading = loadingGroup || loadingSession;
 
     const updateStatus = (studentId: string, status: 'present' | 'absent') => {
         setAttendance(prev => ({
@@ -182,7 +131,7 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
                     group_id: groupId,
                     date: dateStr,
                     class_index: 1, // Defaulting to 1 as per unique constraint
-                    org_id: group.org_id,
+                    org_id: group?.org_id,
                     created_by: user.id,
                     updated_at: new Date().toISOString()
                 }, {
@@ -201,7 +150,7 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
                 status: rec.status,
                 justification: rec.status === 'absent' ? rec.justification : null,
                 comment: rec.comment || null,
-                org_id: group.org_id,
+                org_id: group?.org_id,
                 updated_by: user.id
             }));
 
@@ -303,98 +252,16 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
             )}
 
             <main className="p-4 md:max-w-3xl md:mx-auto space-y-4 pt-6">
-                {students.map((student) => {
-                    const record = attendance[student.id];
-                    if (!record) return null;
-
-                    return (
-                        <div key={student.id}
-                            className={`brand-card p-0 overflow-hidden ring-1 transition-all duration-300 ${record.status === 'present'
-                                ? 'bg-white ring-slate-100'
-                                : 'bg-red-50/30 ring-red-100 shadow-lg shadow-red-500/5'
-                                }`}
-                        >
-                            <div className="p-5 flex flex-col gap-5">
-                                <div className="flex justify-between items-start">
-                                    <div className="min-w-0">
-                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">{student.last_name}</p>
-                                        <h3 className="text-xl font-black text-slate-900 truncate">{student.first_name}</h3>
-                                        {student.doc_id && (
-                                            <p className="text-[10px] font-mono font-bold text-slate-400 mt-1 uppercase">DNI {student.doc_id}</p>
-                                        )}
-                                    </div>
-
-                                    {/* Toggle Segmented Control */}
-                                    <div className="flex p-1 bg-slate-100 rounded-2xl w-44 shrink-0 shadow-inner">
-                                        <button
-                                            onClick={() => updateStatus(student.id, 'present')}
-                                            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[10px] font-black transition-all ${record.status === 'present'
-                                                ? 'bg-white text-emerald-600 shadow-sm ring-1 ring-slate-200/50'
-                                                : 'text-slate-400 hover:text-slate-600'
-                                                }`}
-                                        >
-                                            <Check className={`w-3.5 h-3.5 ${record.status === 'present' ? 'animate-in zoom-in' : ''}`} />
-                                            PRESENTE
-                                        </button>
-                                        <button
-                                            onClick={() => updateStatus(student.id, 'absent')}
-                                            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[10px] font-black transition-all ${record.status === 'absent'
-                                                ? 'bg-red-500 text-white shadow-md shadow-red-500/20'
-                                                : 'text-slate-400 hover:text-slate-600'
-                                                }`}
-                                        >
-                                            <X className={`w-3.5 h-3.5 ${record.status === 'absent' ? 'animate-in zoom-in' : ''}`} />
-                                            AUSENTE
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Absent Details */}
-                                {record.status === 'absent' && (
-                                    <div className="pt-4 border-t border-red-100 space-y-4 animate-in slide-in-from-top-2 duration-300">
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-[9px] font-black text-red-400 uppercase tracking-widest ml-1">Justificación *</label>
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => updateJustification(student.id, 'justified')}
-                                                    className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all border-2 ${record.justification === 'justified'
-                                                        ? 'bg-red-100 border-red-200 text-red-800'
-                                                        : 'bg-white border-red-50 text-red-300 hover:border-red-100'
-                                                        }`}
-                                                >
-                                                    JUSTIFICADA
-                                                </button>
-                                                <button
-                                                    onClick={() => updateJustification(student.id, 'unjustified')}
-                                                    className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all border-2 ${record.justification === 'unjustified'
-                                                        ? 'bg-red-600 border-red-700 text-white shadow-lg shadow-red-500/20'
-                                                        : 'bg-white border-red-50 text-red-300 hover:border-red-100'
-                                                        }`}
-                                                >
-                                                    NO JUSTIFICADA
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-col gap-1.5">
-                                            <div className="flex items-center gap-2 ml-1">
-                                                <MessageSquare className="w-3 h-3 text-red-300" />
-                                                <label className="text-[9px] font-black text-red-400 uppercase tracking-widest">Comentario</label>
-                                            </div>
-                                            <input
-                                                type="text"
-                                                placeholder="Ej. Avisó por cuaderno"
-                                                value={record.comment || ''}
-                                                onChange={(e) => updateComment(student.id, e.target.value)}
-                                                className="bg-white/50 border border-red-100 p-3 rounded-xl text-xs font-bold text-red-900 placeholder:text-red-200 focus:ring-2 focus:ring-red-200 outline-none transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
+                {students.map((student) => (
+                    <StudentRow
+                        key={student.id}
+                        student={student}
+                        record={attendance[student.id]}
+                        updateStatus={updateStatus}
+                        updateJustification={updateJustification}
+                        updateComment={updateComment}
+                    />
+                ))}
             </main>
 
             {/* Sticky Bottom Bar */}
@@ -436,3 +303,94 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
         </div>
     );
 }
+// --- Memoized Row Component ---
+const StudentRow = memo(({ student, record, updateStatus, updateJustification, updateComment }: any) => {
+    if (!record) return null;
+
+    return (
+        <div className={`brand-card p-0 overflow-hidden ring-1 transition-all duration-300 ${record.status === 'present'
+            ? 'bg-white ring-slate-100'
+            : 'bg-red-50/30 ring-red-100 shadow-lg shadow-red-500/5'
+            }`}
+        >
+            <div className="p-5 flex flex-col gap-5">
+                <div className="flex justify-between items-start">
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-0.5">{student.last_name}</p>
+                        <h3 className="text-xl font-black text-slate-900 truncate">{student.first_name}</h3>
+                        {student.doc_id && (
+                            <p className="text-[10px] font-mono font-bold text-slate-400 mt-1 uppercase">DNI {student.doc_id}</p>
+                        )}
+                    </div>
+
+                    <div className="flex p-1 bg-slate-100 rounded-2xl w-44 shrink-0 shadow-inner">
+                        <button
+                            onClick={() => updateStatus(student.id, 'present')}
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[10px] font-black transition-all ${record.status === 'present'
+                                ? 'bg-white text-emerald-600 shadow-sm ring-1 ring-slate-200/50'
+                                : 'text-slate-400 hover:text-slate-600'
+                                }`}
+                        >
+                            <Check className={`w-3.5 h-3.5 ${record.status === 'present' ? 'animate-in zoom-in' : ''}`} />
+                            PRESENTE
+                        </button>
+                        <button
+                            onClick={() => updateStatus(student.id, 'absent')}
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[10px] font-black transition-all ${record.status === 'absent'
+                                ? 'bg-red-500 text-white shadow-md shadow-red-500/20'
+                                : 'text-slate-400 hover:text-slate-600'
+                                }`}
+                        >
+                            <X className={`w-3.5 h-3.5 ${record.status === 'absent' ? 'animate-in zoom-in' : ''}`} />
+                            AUSENTE
+                        </button>
+                    </div>
+                </div>
+
+                {record.status === 'absent' && (
+                    <div className="pt-4 border-t border-red-100 space-y-4 animate-in slide-in-from-top-2 duration-300">
+                        <div className="flex flex-col gap-2">
+                            <label className="text-[9px] font-black text-red-400 uppercase tracking-widest ml-1">Justificación *</label>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => updateJustification(student.id, 'justified')}
+                                    className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all border-2 ${record.justification === 'justified'
+                                        ? 'bg-red-100 border-red-200 text-red-800'
+                                        : 'bg-white border-red-50 text-red-300 hover:border-red-100'
+                                        }`}
+                                >
+                                    JUSTIFICADA
+                                </button>
+                                <button
+                                    onClick={() => updateJustification(student.id, 'unjustified')}
+                                    className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all border-2 ${record.justification === 'unjustified'
+                                        ? 'bg-red-600 border-red-700 text-white shadow-lg shadow-red-500/20'
+                                        : 'bg-white border-red-50 text-red-300 hover:border-red-100'
+                                        }`}
+                                >
+                                    NO JUSTIFICADA
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                            <div className="flex items-center gap-2 ml-1">
+                                <MessageSquare className="w-3 h-3 text-red-300" />
+                                <label className="text-[9px] font-black text-red-400 uppercase tracking-widest">Comentario</label>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Ej. Avisó por cuaderno"
+                                value={record.comment || ''}
+                                onChange={(e) => updateComment(student.id, e.target.value)}
+                                className="bg-white/50 border border-red-100 p-3 rounded-xl text-xs font-bold text-red-900 placeholder:text-red-200 focus:ring-2 focus:ring-red-200 outline-none transition-all"
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
+
+StudentRow.displayName = 'StudentRow';

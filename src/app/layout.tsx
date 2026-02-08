@@ -12,6 +12,8 @@ export const metadata = {
   description: "Gestión de asistencia ágil y moderna para docentes.",
 };
 
+import QueryProvider from "@/components/providers/query-provider";
+
 export default function RootLayout({
   children,
 }: {
@@ -20,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${inter.className} brand-gradient min-h-screen`}>
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );
